@@ -3,12 +3,12 @@
 /* FullCalendar denser SaaS look — brand chỉ trên chrome nút */
 .fc {
   --fc-border-color: #e2e8f0;
-  --fc-button-bg-color: #5d5cc4;
-  --fc-button-border-color: #5d5cc4;
-  --fc-button-hover-bg-color: #4a49a3;
-  --fc-button-hover-border-color: #4a49a3;
-  --fc-button-active-bg-color: #3d3c8a;
-  --fc-button-active-border-color: #3d3c8a;
+  --fc-button-bg-color: #5d4094;
+  --fc-button-border-color: #5d4094;
+  --fc-button-hover-bg-color: #47326f;
+  --fc-button-hover-border-color: #47326f;
+  --fc-button-active-bg-color: #362555;
+  --fc-button-active-border-color: #362555;
   --fc-today-bg-color: #f8fafc;
   font-size: 0.8125rem;
 }
@@ -57,20 +57,20 @@
 }
 
 :root {
-  --background: #f4f6f8;
+  --background: #ffffff;
   --foreground: #0f172a;
   --card: #ffffff;
   --muted: #64748b;
   --border: #e2e8f0;
   /* Brand chrome — CTA / nav active / FAB */
-  --brand-50: #f3f3fb;
-  --brand-100: #e4e4f6;
-  --brand-300: #9b9adc;
-  --brand-400: #7a79d0;
-  --brand-500: #5d5cc4;
-  --brand-600: #4a49a3;
-  --brand-700: #3d3c8a;
-  --brand-950: #1e1e3d;
+  --brand-50: #f6f4fb;
+  --brand-100: #eae4f6;
+  --brand-300: #b19ada;
+  --brand-400: #997dcc;
+  --brand-500: #5d4094;
+  --brand-600: #47326f;
+  --brand-700: #362555;
+  --brand-950: #291e3d;
   --primary: var(--brand-500);
   --primary-foreground: #ffffff;
   /* Semantic — tách khỏi brand */

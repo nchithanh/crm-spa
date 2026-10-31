@@ -88,10 +88,31 @@ export function AppShellSkeleton({
 
 export function DashboardSkeleton() {
   return (
-    <div className="space-y-5" aria-busy="true" aria-label="Đang tải dashboard">
-      <div className="space-y-2">
-        <Skeleton className="h-7 w-64" />
-        <Skeleton className="h-3.5 w-80 max-w-full" />
+    <div
+      className="space-y-5 lg:pt-[10vh]"
+      aria-busy="true"
+      aria-label="Đang tải dashboard"
+    >
+      <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-4 pt-2 pb-1">
+        <Skeleton className="h-3 w-36" />
+        <Skeleton className="h-8 w-72 max-w-full" />
+        <Skeleton className="h-14 w-full rounded-2xl" />
+      </div>
+      <div className="mx-auto w-full max-w-5xl space-y-2">
+        <Skeleton className="h-3 w-24" />
+        <div className="grid gap-x-8 gap-y-4 sm:grid-cols-2 xl:grid-cols-3">
+          {Array.from({ length: 3 }, (_, c) => (
+            <div
+              key={c}
+              className="space-y-1.5 border-b border-[var(--border)] pb-4 last:border-b-0 sm:border-b-0 sm:pb-0"
+            >
+              <Skeleton className="h-3 w-24" />
+              {Array.from({ length: 5 }, (_, i) => (
+                <Skeleton key={i} className="h-11 w-full" />
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
       <div className="grid grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-6">
         {Array.from({ length: 6 }, (_, i) => (

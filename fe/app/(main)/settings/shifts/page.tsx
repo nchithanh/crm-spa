@@ -48,7 +48,7 @@ export default function ShiftsPage() {
                   {bundle.branches.find((b) => b.id === t.branchId)?.name}
                 </p>
               </div>
-              <p className="text-sm font-bold text-[var(--brand-700)]">
+              <p className="text-sm font-bold text-emerald-700">
                 {sh ? `${sh.startHour}:00 – ${sh.endHour}:00` : "Nghỉ"}
               </p>
             </Card>

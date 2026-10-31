@@ -2,6 +2,44 @@
 
 SoT nhật ký runtime FE. Product planning cũ: `docs/product/dolphin-beauty-crm/06-planning/fe-wave1-changelog.md` (legacy; ưu tiên file này khi coding).
 
+## 2026-10-31 — Tổng quan full width · search 2 lớp · recents 3×5
+
+- Bỏ `max-w-5xl`: hero + toàn bộ section rộng full content như dashboard gốc; search full width.
+- Search 2 lớp (halo `slate-50` + ô trắng shadow) + 2 keycap rời `Ctrl` `K`.
+- **Gần đây** 15 action, `xl` grid 3 cột × 5 hàng (column-major); bỏ border/card, hover `brand-50`.
+- Khôi phục đầy đủ overview A–G (A KPI · B chart · C+D · E · F · G 8 InsightList) dưới recents.
+- Hero search + Gần đây thu về `max-w-5xl` căn giữa; A–G vẫn full width.
+- Gần đây chia 3 cột theo lĩnh vực có title (Khách hàng · Lịch hẹn & Dịch vụ · Chăm sóc KH), 5 action/cột, recents đẩy lên đầu cột.
+- Trang Tổng quan thêm `lg:pt-[10vh]` (desktop).
+- Nền app `--background` → trắng (cùng menu); card dựa border + shadow.
+- Mobile: 3 lĩnh vực Gần đây cách nhau `border-b`, bỏ border từ `sm+`.
+
+## 2026-10-31 — Tổng quan theo style Cloudflare
+
+- `/` đổi bố cục: hero **Hôm nay bạn cần gì?** + search lớn mở quick search → card **Gần đây** (6 route gần nhất) → **Phân tích** (`OpsCharts`).
+- Bỏ PageHeader + dải KPI A/C/E/F + lưới InsightList G + band C/D khỏi dashboard; dữ liệu vẫn ở trang chuyên mục.
+- `lib/recents.ts`: lưu `beauty-recent-nav` trong localStorage, gộp route con về mục nav; fallback gợi ý.
+- `DashboardSkeleton` cập nhật theo bố cục mới.
+
+## 2026-10-31 — Theme tím #5d4094
+
+- Scale brand: 50 `#f6f4fb` · 100 `#eae4f6` · 300 `#b19ada` · 400 `#997dcc` · 500 `#5d4094` · 600 `#47326f` · 700 `#362555` · 950 `#291e3d`.
+- FullCalendar button · themeColor · dock FAB shadow · màu lịch `confirmed` theo brand mới.
+- Semantic colors giữ nguyên. Favicon/icon PNG vẫn mark indigo cũ.
+
+## 2026-10-31 — Quick search (Ctrl K · pinch 2 ngón)
+
+- Popup **Tìm nhanh** (AI-style, tìm cục bộ): `Ctrl/⌘K` desktop · pinch 2 ngón iPad/mobile · nút cạnh chuông.
+- Index từ `NAV_GROUPS` + alias tiếng Việt không dấu; `↑ ↓ Enter`, `Esc`, gợi ý khi chưa gõ.
+- Trigger ẩn nhãn trên mobile (icon-only) để không vỡ header.
+
+## 2026-10-31 — Tổng quan: gộp C + D
+
+- Dashboard: C · Giữ chân khách và D · Chăm sóc hôm nay chung hàng `lg:grid-cols-2`; D rộng 50% bên phải.
+- C: KPI đổi lưới 4 cột → 2×2 khi nửa width (`md:grid-cols-4 lg:grid-cols-2`).
+- Dưới `lg`: vẫn xếp dọc, full width.
+- D · Chăm sóc hôm nay: chỉ hiển thị tối đa 4 việc (`slice(0, 4)`).
+
 ## 2026-10-31 — Copy VI · nav 1 active · Tổng quan đầu
 
 - Nav + dashboard: tiếng Việt; giữ keyword Zalo · VIP · POS · OA · KPI · CRM.

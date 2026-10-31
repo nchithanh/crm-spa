@@ -13,7 +13,7 @@ export default function ChooseVerticalPage() {
   return (
     <div className="mx-auto flex min-h-svh max-w-3xl flex-col justify-center gap-6 px-4 py-10">
       <div>
-        <p className="text-xs font-semibold tracking-wide text-[var(--brand-600)] uppercase">
+        <p className="text-xs font-semibold tracking-wide text-emerald-600 uppercase">
           Dolphin Beauty CRM
         </p>
         <h1 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">

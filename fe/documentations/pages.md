@@ -11,7 +11,7 @@ SoT: `lib/nav.ts` (`NAV_GROUPS`, `MOBILE_DOCK`).
 
 ## Đã có nghiệp vụ mock
 
-`/` (Dashboard A–G) · Customer Directory + 360 · Care · Segments · Retention · Automations · Campaigns · Zalo Center · Bookings (+ history / cancelled / rebooking) · Packages · Services · Reports (+ sub) · Finance stub · Settings (+ activity / Ops / POS / notifications / reset)
+`/` (Tổng quan: search AI · Gần đây · A–G) · Customer Directory + 360 · Care · Segments · Retention · Automations · Campaigns · Zalo Center · Bookings (+ history / cancelled / rebooking) · Packages · Services · Reports (+ sub) · Finance stub · Settings (+ activity / Ops / POS / notifications / reset)
 
 ## Care (Pass 3)
 
@@ -47,4 +47,6 @@ SoT: `lib/nav.ts` (`NAV_GROUPS`, `MOBILE_DOCK`).
 - Header: search · CTA primary chữ trắng Đặt lịch / Gửi Zalo · outline Khách mới / Báo cáo · chuông.
 - `/bookings`: toolbar gộp · mặc định tuần · Ops panel khi chọn / đặt mới.
 - Loading: `AppShellSkeleton` khi hydrate/redirect; dashboard / lịch dùng khung pulse (`components/ui/skeleton.tsx`).
+- Quick search: `Ctrl K` / `⌘K` (desktop) hoặc pinch 2 ngón (iPad/mobile) hoặc nút **Tìm nhanh** cạnh chuông → popup tìm chức năng / thao tác từ `NAV_GROUPS` + alias không dấu, `↑ ↓ Enter`, `Esc` đóng. Tìm cục bộ (mock), SoT `components/layout/quick-search.tsx`.
+- `/` hero search AI full width mở quick search (`openQuickSearch()`); **Gần đây** 3 cột × 5 action ghi nhận mỗi lần đổi route (tối đa 15, bù gợi ý khi thiếu, `localStorage` key `beauty-recent-nav`, SoT `lib/recents.ts`).
 - Mobile dock: Tổng quan (logo) · Khách · Lịch · Việc · Menu. `/menu` Vận hành gồm nhóm Zalo.

@@ -32,7 +32,7 @@ export function MobileBottomDock({ tasksBadge = 0 }: { tasksBadge?: number }) {
             aria-label={center.label}
             className={cn(
               "absolute top-0 left-1/2 z-20 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-full text-white transition",
-              "shadow-[0_6px_18px_rgba(93,92,196,0.42)]",
+              "shadow-[0_6px_18px_rgba(93,64,148,0.42)]",
               centerActive
                 ? "bg-[var(--brand-600)]"
                 : "bg-[var(--brand-500)]",
@@ -59,7 +59,7 @@ export function MobileBottomDock({ tasksBadge = 0 }: { tasksBadge?: number }) {
                       href={item.href}
                       className={cn(
                         "flex h-full flex-col items-center justify-end gap-0.5 px-0.5 pb-1",
-                        active ? "text-[var(--brand-600)]" : "text-slate-400",
+                        active ? "text-emerald-600" : "text-slate-400",
                       )}
                     >
                       <span className="flex h-5 w-5 shrink-0 items-center justify-center">
@@ -81,7 +81,7 @@ export function MobileBottomDock({ tasksBadge = 0 }: { tasksBadge?: number }) {
                   <span
                     className={cn(
                       "h-3.5 w-full truncate text-center text-[10px] leading-none font-medium",
-                      centerActive ? "text-[var(--brand-600)]" : "text-slate-400",
+                      centerActive ? "text-emerald-600" : "text-slate-400",
                     )}
                   >
                     {center.mobileLabel ?? center.label}
@@ -97,13 +97,13 @@ export function MobileBottomDock({ tasksBadge = 0 }: { tasksBadge?: number }) {
                       href={item.href}
                       className={cn(
                         "relative flex h-full flex-col items-center justify-end gap-0.5 px-0.5 pb-1",
-                        active ? "text-[var(--brand-600)]" : "text-slate-400",
+                        active ? "text-emerald-600" : "text-slate-400",
                       )}
                     >
                       <span className="relative flex h-5 w-5 shrink-0 items-center justify-center">
                         <Icon size={20} strokeWidth={2} />
                         {item.href === "/tasks" && tasksBadge > 0 ? (
-                          <span className="absolute -top-1.5 -right-2 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--brand-500)] px-1 text-[9px] font-bold text-white">
+                          <span className="absolute -top-1.5 -right-2 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-emerald-500 px-1 text-[9px] font-bold text-white">
                             {tasksBadge > 9 ? "9+" : tasksBadge}
                           </span>
                         ) : null}
@@ -119,7 +119,7 @@ export function MobileBottomDock({ tasksBadge = 0 }: { tasksBadge?: number }) {
                   href={MOBILE_DOCK.menu.href}
                   className={cn(
                     "flex h-full flex-col items-center justify-end gap-0.5 px-0.5 pb-1",
-                    menuActive ? "text-[var(--brand-600)]" : "text-slate-400",
+                    menuActive ? "text-emerald-600" : "text-slate-400",
                   )}
                   aria-label="Menu"
                 >

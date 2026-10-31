@@ -8,7 +8,7 @@ const COLORS: Record<WorkflowNodeType, string> = {
   TRIGGER: "border-sky-400 bg-sky-50",
   DELAY: "border-amber-400 bg-amber-50",
   CONDITION: "border-violet-400 bg-violet-50",
-  SEND_ZALO_TEMPLATE: "border-[var(--brand-400)] bg-[var(--brand-50)]",
+  SEND_ZALO_TEMPLATE: "border-emerald-400 bg-emerald-50",
   ADD_TAG: "border-slate-400 bg-slate-50",
   CREATE_TASK: "border-orange-400 bg-orange-50",
   END: "border-slate-500 bg-white",
@@ -32,7 +32,7 @@ export function WfFlowNode({ data, selected }: NodeProps) {
       className={cn(
         "min-w-[10rem] rounded-[12px] border-2 px-3 py-2 shadow-sm",
         COLORS[d.nodeType],
-        selected && "ring-2 ring-[var(--brand-500)]",
+        selected && "ring-2 ring-emerald-500",
         d.invalid && "border-rose-500 ring-2 ring-rose-300",
       )}
     >
@@ -56,7 +56,7 @@ export function WfFlowNode({ data, selected }: NodeProps) {
         <Handle
           type="source"
           position={Position.Right}
-          className="!h-2.5 !w-2.5 !bg-[var(--brand-600)]"
+          className="!h-2.5 !w-2.5 !bg-emerald-600"
         />
       ) : null}
       {isCondition ? (
@@ -66,7 +66,7 @@ export function WfFlowNode({ data, selected }: NodeProps) {
             type="source"
             position={Position.Right}
             style={{ top: "35%" }}
-            className="!h-2.5 !w-2.5 !bg-[var(--brand-600)]"
+            className="!h-2.5 !w-2.5 !bg-emerald-600"
           />
           <Handle
             id="false"

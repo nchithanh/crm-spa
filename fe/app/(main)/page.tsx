@@ -1,10 +1,12 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { ChevronRight, Search } from "lucide-react";
 import { OpsCharts } from "@/components/dashboard/ops-charts";
+import { openQuickSearch } from "@/components/layout/quick-search";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { PageHeader } from "@/components/ui/page-header";
 import { StatCard } from "@/components/ui/stat";
 import { getCampaignStats } from "@/lib/campaign-utils";
 import {
@@ -21,18 +23,27 @@ import {
   getUpcomingBookings,
   getWorkflowStats,
 } from "@/lib/selectors";
+import { getRecentColumns, type RecentColumn } from "@/lib/recents";
 import { formatDateTime, formatVnd } from "@/lib/utils";
-import { DashboardSkeleton } from "@/components/ui/skeleton";
+import { DashboardSkeleton, Skeleton } from "@/components/ui/skeleton";
 import { useAppStore } from "@/stores/app-store";
+
+type RecentState = { columns: RecentColumn[]; isFallback: boolean };
 
 export default function DashboardPage() {
   const bundle = useAppStore((s) => s.bundle);
+  const [recent, setRecent] = useState<RecentState | null>(null);
+
+  useEffect(() => {
+    setRecent(getRecentColumns());
+  }, []);
+
   if (!bundle) return <DashboardSkeleton />;
 
   const m = getCustomerStats(bundle);
   const wf = getWorkflowStats(bundle);
   const camp = getCampaignStats(bundle);
-  const careToday = getCareTodayRows(bundle);
+  const careToday = getCareTodayRows(bundle).slice(0, 4);
   const atRisk = getAtRiskCustomers(bundle).slice(0, 6);
   const inactiveN = getInactiveCount(bundle);
   const birthdays = customersBirthdaySoon(bundle.customers).slice(0, 6);
@@ -46,11 +57,115 @@ export default function DashboardPage() {
     .slice(0, 5);
 
   return (
-    <div className="space-y-5">
-      <PageHeader
-        title="Bảng điều khiển"
-        description={`${bundle.orgName} · KPI chăm sóc · Chiến dịch tách khỏi luồng tự động`}
-      />
+    <div className="space-y-5 lg:pt-[10vh]">
+      {/* Hero: AI quick search */}
+      <section className="mx-auto w-full max-w-5xl space-y-4 pt-2 pb-1 text-center">
+        <div className="space-y-1">
+          <p className="text-[11px] font-bold tracking-[0.18em] text-[var(--brand-500)] uppercase">
+            {bundle.orgName}
+          </p>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 lg:text-3xl">
+            Hôm nay bạn cần gì?
+          </h1>
+        </div>
+        <div className="rounded-2xl border border-slate-200/70 bg-slate-50/70 p-1.5">
+          <button
+            type="button"
+            onClick={openQuickSearch}
+            aria-label="Tìm chức năng, thao tác"
+            className="flex h-11 w-full items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3.5 text-left shadow-[0_1px_2px_rgba(15,23,42,0.06)] transition hover:border-[var(--brand-300)] hover:shadow-sm"
+          >
+            <Search size={18} className="shrink-0 text-slate-400" />
+            <span className="min-w-0 flex-1 truncate text-sm text-slate-400">
+              Tìm chức năng, thao tác…
+            </span>
+            <span className="hidden shrink-0 items-center gap-1 sm:flex">
+              <kbd className="rounded-md border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] font-semibold text-slate-500">
+                Ctrl
+              </kbd>
+              <kbd className="rounded-md border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] font-semibold text-slate-500">
+                K
+              </kbd>
+            </span>
+          </button>
+        </div>
+      </section>
+
+      {/* Recently opened features — 3 cột × 5 */}
+      <section
+        aria-labelledby="dash-recent"
+        className="mx-auto w-full max-w-5xl"
+      >
+        <div className="mb-1 flex items-center justify-between gap-2">
+          <h2
+            id="dash-recent"
+            className="text-xs font-bold tracking-wide text-slate-500 uppercase"
+          >
+            {recent?.isFallback ? "Gợi ý nhanh" : "Gần đây"}
+          </h2>
+          <button
+            type="button"
+            onClick={openQuickSearch}
+            className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-[var(--brand-600)] hover:underline"
+          >
+            Tất cả chức năng
+            <ChevronRight size={12} />
+          </button>
+        </div>
+
+        {recent === null ? (
+          <div className="grid gap-x-8 gap-y-4 sm:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 3 }, (_, c) => (
+              <div
+                key={c}
+                className="space-y-1.5 border-b border-[var(--border)] pb-4 last:border-b-0 sm:border-b-0 sm:pb-0"
+              >
+                <Skeleton className="h-3 w-24" />
+                {Array.from({ length: 5 }, (_, i) => (
+                  <Skeleton key={i} className="h-11 w-full" />
+                ))}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid gap-x-8 gap-y-4 sm:grid-cols-2 xl:grid-cols-3">
+            {recent.columns.map((column) => (
+              <div
+                key={column.id}
+                className="min-w-0 border-b border-[var(--border)] pb-4 last:border-b-0 sm:border-b-0 sm:pb-0"
+              >
+                <h3 className="mb-1.5 px-2.5 text-[10px] font-bold tracking-wide text-slate-400 uppercase">
+                  {column.title}
+                </h3>
+                <ul className="space-y-0.5">
+                  {column.items.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <li key={item.href}>
+                        <Link
+                          href={item.href}
+                          className="group flex min-h-11 items-center gap-2.5 rounded-lg px-2.5 py-1.5 transition hover:bg-[var(--brand-50)]"
+                        >
+                          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--brand-50)] text-[var(--brand-600)]">
+                            <Icon size={16} />
+                          </span>
+                          <span className="min-w-0 flex-1 truncate text-sm font-medium text-slate-700 group-hover:text-[var(--brand-700)]">
+                            {item.label}
+                          </span>
+                          <ChevronRight
+                            size={14}
+                            className="shrink-0 text-slate-300 opacity-0 transition group-hover:opacity-100"
+                          />
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
 
       {/* A. Business Snapshot */}
       <section aria-labelledby="dash-a">
@@ -89,69 +204,70 @@ export default function DashboardPage() {
         <OpsCharts bundle={bundle} />
       </section>
 
-      {/* C. Retention Insights */}
-      <section aria-labelledby="dash-c">
-        <h2
-          id="dash-c"
-          className="mb-2 text-xs font-bold tracking-wide text-slate-500 uppercase"
-        >
-          C · Giữ chân khách
-        </h2>
-        <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
-          <StatCard label="Tỷ lệ tái đặt" metric={m.rebookingRate} href="/reports/retention" />
-          <StatCard label="Nguy cơ rời" metric={m.atRiskCustomers} href="/retention/at-risk" />
-          <StatCard
-            label="Cơ hội tái đặt"
-            metric={{
-              available: true,
-              value: rebook.length,
-              definition: "Có DV, chưa có lịch sắp tới",
-            }}
-            href="/bookings/rebooking"
-          />
-          <StatCard label="Doanh thu (POS)" metric={m.totalSpend} money />
-        </div>
-      </section>
+      {/* C. Retention Insights + D. Customer Care Today */}
+      <div className="grid gap-3 lg:grid-cols-2">
+        <section aria-labelledby="dash-c">
+          <h2
+            id="dash-c"
+            className="mb-2 text-xs font-bold tracking-wide text-slate-500 uppercase"
+          >
+            C · Giữ chân khách
+          </h2>
+          <div className="grid grid-cols-2 gap-2 md:grid-cols-4 lg:grid-cols-2">
+            <StatCard label="Tỷ lệ tái đặt" metric={m.rebookingRate} href="/reports/retention" />
+            <StatCard label="Nguy cơ rời" metric={m.atRiskCustomers} href="/retention/at-risk" />
+            <StatCard
+              label="Cơ hội tái đặt"
+              metric={{
+                available: true,
+                value: rebook.length,
+                definition: "Có DV, chưa có lịch sắp tới",
+              }}
+              href="/bookings/rebooking"
+            />
+            <StatCard label="Doanh thu (POS)" metric={m.totalSpend} money />
+          </div>
+        </section>
 
-      {/* D. Customer Care Today */}
-      <section aria-labelledby="dash-d">
-        <h2
-          id="dash-d"
-          className="mb-2 text-xs font-bold tracking-wide text-slate-500 uppercase"
-        >
-          D · Chăm sóc hôm nay
-        </h2>
-        <Card className="overflow-hidden">
-          {careToday.length === 0 ? (
-            <p className="p-4 text-sm text-slate-500">Không có việc chăm sóc hôm nay.</p>
-          ) : (
-            <ul className="divide-y divide-slate-100">
-              {careToday.map((row) => (
-                <li key={row.id}>
-                  <Link
-                    href={`/customers/${row.customerId}`}
-                    className="flex flex-col gap-1 px-4 py-3 hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between"
-                  >
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold">
-                        {row.customerName}
-                      </p>
-                      <p className="truncate text-xs text-slate-500">
-                        {row.reason} · {row.assigneeName} · hạn{" "}
-                        {formatDateTime(row.dueAt)}
-                      </p>
-                    </div>
-                    <Badge
-                      status={row.overdue ? "overdue" : row.priority}
-                      label={row.priority}
-                    />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
-      </section>
+        <section aria-labelledby="dash-d">
+          <h2
+            id="dash-d"
+            className="mb-2 text-xs font-bold tracking-wide text-slate-500 uppercase"
+          >
+            D · Chăm sóc hôm nay
+          </h2>
+          <Card className="overflow-hidden">
+            {careToday.length === 0 ? (
+              <p className="p-4 text-sm text-slate-500">Không có việc chăm sóc hôm nay.</p>
+            ) : (
+              <ul className="divide-y divide-slate-100">
+                {careToday.map((row) => (
+                  <li key={row.id}>
+                    <Link
+                      href={`/customers/${row.customerId}`}
+                      className="flex flex-col gap-1 px-4 py-3 hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold">
+                          {row.customerName}
+                        </p>
+                        <p className="truncate text-xs text-slate-500">
+                          {row.reason} · {row.assigneeName} · hạn{" "}
+                          {formatDateTime(row.dueAt)}
+                        </p>
+                      </div>
+                      <Badge
+                        status={row.overdue ? "overdue" : row.priority}
+                        label={row.priority}
+                      />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Card>
+        </section>
+      </div>
 
       {/* E. Automation Health */}
       <section aria-labelledby="dash-e">

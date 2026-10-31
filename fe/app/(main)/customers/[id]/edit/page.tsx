@@ -15,7 +15,7 @@ export default function EditCustomerPage() {
     return (
       <Card className="p-6 text-sm">
         Không tìm thấy khách.{" "}
-        <Link href="/customers" className="text-[var(--brand-600)]">
+        <Link href="/customers" className="text-emerald-600">
           Quay lại
         </Link>
       </Card>

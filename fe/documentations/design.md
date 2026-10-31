@@ -2,11 +2,11 @@
 
 Tokens: `app/globals.css`.
 
-## Brand chrome (indigo Dolphin)
+## Brand chrome (tím Dolphin)
 
 Dùng **chỉ** cho chrome:
 
-- CTA primary (`Button` default) → `--brand-500` / `#5d5cc4`
+- CTA primary (`Button` default) → `--brand-500` / `#5d4094`
 - Nav active · dock FAB giữa · focus input · FullCalendar toolbar buttons
 - Soft wash: `--brand-50` / `--brand-100`
 
@@ -33,6 +33,12 @@ Helper CSS: `.text-debt` `.text-gain` `.bg-debt-soft` · Badge map trong `compon
 - **Sidebar thứ tự:** Tổng quan → Lịch hẹn → Khách → Chăm sóc → Zalo → Marketing → Giữ chân → Báo cáo → Hệ thống. Một mục active.
 - **`/bookings`:** một toolbar; mặc định tuần; tháng `dayMaxEvents=3`; event `HH:mm · Tên KH`; Ops chỉ khi chọn.
 - **Mobile:** dock POS-like giữ nguyên (logo · Khách · Lịch giữa · Việc · Menu).
+- **Dashboard `/`:** hero **search AI** (2 lớp: halo nhạt + ô trắng, `Ctrl/⌘K`) và **Gần đây** gói trong `max-w-5xl` căn giữa, `lg:pt-[10vh]`; Gần đây = 3 cột theo 3 lĩnh vực chính (**Khách hàng** · **Lịch hẹn & Dịch vụ** · **Chăm sóc KH**), mỗi cột có title + 5 action không border/card, hover `brand-50`; overview A–G full width.
+
+## Surface
+
+- Nền app `--background` **trắng** (cùng `--card` / menu sidebar). Card phân biệt bằng border `--border` + shadow, không dựa vào nền tint.
+- Dashboard `/` mobile: 3 cột Gần đây cách nhau `border-b`; từ `sm+` bỏ border.
 
 ## Radius
 

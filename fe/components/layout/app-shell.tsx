@@ -14,12 +14,14 @@ import { useEffect, useState } from "react";
 import { BrandMark } from "@/components/brand-mark";
 import { MobileBottomDock } from "@/components/layout/mobile-bottom-dock";
 import { PersistBridge } from "@/components/layout/persist-bridge";
+import { QuickSearch } from "@/components/layout/quick-search";
 import { Button } from "@/components/ui/button";
 import {
   NAV_GROUPS,
   SwitchVerticalIcon,
   isNavActive,
 } from "@/lib/nav";
+import { navHrefFor, pushRecent } from "@/lib/recents";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/stores/app-store";
 
@@ -45,6 +47,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     const saved = window.sessionStorage.getItem("beauty-branch");
     if (saved) setBranchId(saved);
   }, []);
+
+  useEffect(() => {
+    const href = navHrefFor(pathname);
+    if (href) pushRecent(href);
+  }, [pathname]);
 
   const badgeFor = (key?: "tasks" | "runs") => {
     if (key === "tasks" && openTasks > 0) return openTasks;
@@ -224,6 +231,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 Báo cáo
               </Link>
             </div>
+
+            <QuickSearch />
 
             <button
               type="button"

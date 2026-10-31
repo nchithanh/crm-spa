@@ -18,7 +18,7 @@ export function StatCard({
     <Card
       className={cn(
         "h-full p-3",
-        href && "transition hover:border-brand hover:shadow-sm",
+        href && "transition hover:border-emerald-200 hover:shadow-sm",
       )}
       title={metric.definition}
     >
