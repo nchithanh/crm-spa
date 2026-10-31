@@ -58,8 +58,36 @@ export type NavGroup = {
   items: NavItem[];
 };
 
-/** IA desktop — ưu tiên thao tác lễ tân / NV spa hàng ngày */
+/** IA desktop — nhóm đầu: Tổng quan */
 export const NAV_GROUPS: NavGroup[] = [
+  {
+    id: "overview",
+    label: "Tổng quan",
+    items: [
+      {
+        href: "/",
+        label: "Tổng quan",
+        icon: LayoutDashboard,
+        mobilePrimary: true,
+        mobileLabel: "Tổng quan",
+      },
+      {
+        href: "/insights",
+        label: "Phân tích khách",
+        icon: PieChart,
+      },
+      {
+        href: "/today",
+        label: "Hoạt động hôm nay",
+        icon: Activity,
+      },
+      {
+        href: "/alerts",
+        label: "Cảnh báo & cơ hội",
+        icon: AlertTriangle,
+      },
+    ],
+  },
   {
     id: "ops",
     label: "Lịch hẹn & Dịch vụ",
@@ -81,7 +109,7 @@ export const NAV_GROUPS: NavGroup[] = [
         label: "Liệu trình / gói còn lại",
         icon: Package,
       },
-      { href: "/services", label: "Dịch vụ (catalog)", icon: Sparkles },
+      { href: "/services", label: "Dịch vụ (danh mục)", icon: Sparkles },
       {
         href: "/bookings/cancelled",
         label: "Hủy / bỏ lỡ",
@@ -113,7 +141,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: "/segments", label: "Phân nhóm", icon: UsersRound },
       {
         href: "/customers/tags",
-        label: "Tags & phân loại",
+        label: "Thẻ & phân loại",
         icon: Tags,
       },
       {
@@ -123,7 +151,7 @@ export const NAV_GROUPS: NavGroup[] = [
       },
       {
         href: "/customers/import",
-        label: "Import / Export",
+        label: "Nhập / Xuất",
         icon: Import,
       },
       {
@@ -179,7 +207,7 @@ export const NAV_GROUPS: NavGroup[] = [
     id: "zalo",
     label: "Zalo",
     items: [
-      { href: "/communication", label: "Zalo Center", icon: MessageSquare },
+      { href: "/communication", label: "Trung tâm Zalo", icon: MessageSquare },
       {
         href: "/communication/templates",
         label: "Mẫu tin nhắn",
@@ -193,40 +221,12 @@ export const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    id: "overview",
-    label: "Tổng quan",
-    items: [
-      {
-        href: "/",
-        label: "Dashboard",
-        icon: LayoutDashboard,
-        mobilePrimary: true,
-        mobileLabel: "Tổng quan",
-      },
-      {
-        href: "/insights",
-        label: "Customer Insights",
-        icon: PieChart,
-      },
-      {
-        href: "/today",
-        label: "Hoạt động hôm nay",
-        icon: Activity,
-      },
-      {
-        href: "/alerts",
-        label: "Cảnh báo & cơ hội",
-        icon: AlertTriangle,
-      },
-    ],
-  },
-  {
     id: "marketing",
-    label: "Marketing & Automation",
+    label: "Marketing & tự động",
     items: [
       {
         href: "/automations",
-        label: "Automation Workflows",
+        label: "Luồng tự động",
         icon: Workflow,
         badgeKey: "runs",
       },
@@ -316,7 +316,7 @@ export const NAV_GROUPS: NavGroup[] = [
       },
       {
         href: "/reports/automation",
-        label: "Hiệu quả Automation",
+        label: "Hiệu quả tự động",
         icon: Workflow,
       },
       {
@@ -403,7 +403,12 @@ export const MOBILE_DOCK = {
 
 export function isNavActive(href: string, pathname: string) {
   if (href === "/") return pathname === "/";
-  return pathname === href || pathname.startsWith(`${href}/`);
+  const matches = NAV_ITEMS.filter(
+    (i) =>
+      i.href !== "/" &&
+      (pathname === i.href || pathname.startsWith(`${i.href}/`)),
+  ).sort((a, b) => b.href.length - a.href.length);
+  return matches[0]?.href === href;
 }
 
 export function findNavLabel(pathname: string): string {

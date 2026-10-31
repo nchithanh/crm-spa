@@ -26,9 +26,11 @@ Helper CSS: `.text-debt` `.text-gain` `.bg-debt-soft` · Badge map trong `compon
 
 ## Shell (tham chiếu POS + CRM)
 
+- **Favicon / PWA icon:** `public/favicon.ico` · `icon-192.png` · `icon-512.png` (mark Dolphin indigo).
+- **Skeleton:** `animate-pulse` khối `slate-200` / `--brand-100`; bo `rounded-xl` / card 12px. SoT: `components/ui/skeleton.tsx`.
 - **Sidebar desktop (`lg+`, 260px):** nền trắng; BrandMark + «DOLPHIN BEAUTY»; nhóm **luôn mở** + scroll (không accordion); CN trong sidebar; footer avatar + đổi lĩnh vực. Active: `--brand-50` + rail trái `--brand-500`.
 - **Header desktop:** search (Enter → `/customers?q=`) · CTA primary chữ **trắng** trên indigo (**Đặt lịch** · **Gửi Zalo**) · outline **Khách mới** · **Báo cáo** · chuông. Không breadcrumb.
-- **Sidebar thứ tự:** Lịch hẹn → Khách → Chăm sóc → Zalo → Tổng quan → Marketing → Giữ chân → Báo cáo → Hệ thống.
+- **Sidebar thứ tự:** Tổng quan → Lịch hẹn → Khách → Chăm sóc → Zalo → Marketing → Giữ chân → Báo cáo → Hệ thống. Một mục active.
 - **`/bookings`:** một toolbar; mặc định tuần; tháng `dayMaxEvents=3`; event `HH:mm · Tên KH`; Ops chỉ khi chọn.
 - **Mobile:** dock POS-like giữ nguyên (logo · Khách · Lịch giữa · Việc · Menu).
 

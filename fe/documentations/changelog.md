@@ -2,6 +2,23 @@
 
 SoT nhật ký runtime FE. Product planning cũ: `docs/product/dolphin-beauty-crm/06-planning/fe-wave1-changelog.md` (legacy; ưu tiên file này khi coding).
 
+## 2026-10-31 — Copy VI · nav 1 active · Tổng quan đầu
+
+- Nav + dashboard: tiếng Việt; giữ keyword Zalo · VIP · POS · OA · KPI · CRM.
+- `isNavActive`: chỉ highlight href khớp dài nhất (hết sáng đồng thời cha/con).
+- Sidebar: nhóm đầu **Tổng quan**.
+
+## 2026-10-31 — Skeleton screen
+
+- Primitive `Skeleton` + `AppShellSkeleton` / `DashboardSkeleton` / `CalendarSkeleton`.
+- Hydrate (`VerticalGate`) và redirect `(main)/layout` không còn chữ «Đang tải…».
+- Dashboard / bookings / FC dynamic: khung pulse thay `null` / «Đang tải lịch…».
+
+## 2026-10-31 — Favicon
+
+- Tab / bookmark: `favicon.ico` · `icon-192.png` · `icon-512.png` (mark Dolphin, cùng file CRM).
+- `metadata.icons` trong `app/layout.tsx`.
+
 ## 2026-10-31 — Pages custom domain (bỏ `/crm-spa` prefix)
 
 - Custom domain `crm-spa.dolphin-software.io.vn` phục vụ artifact ở **root**.

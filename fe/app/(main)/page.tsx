@@ -22,11 +22,12 @@ import {
   getWorkflowStats,
 } from "@/lib/selectors";
 import { formatDateTime, formatVnd } from "@/lib/utils";
+import { DashboardSkeleton } from "@/components/ui/skeleton";
 import { useAppStore } from "@/stores/app-store";
 
 export default function DashboardPage() {
   const bundle = useAppStore((s) => s.bundle);
-  if (!bundle) return null;
+  if (!bundle) return <DashboardSkeleton />;
 
   const m = getCustomerStats(bundle);
   const wf = getWorkflowStats(bundle);
@@ -47,8 +48,8 @@ export default function DashboardPage() {
   return (
     <div className="space-y-5">
       <PageHeader
-        title="Business & Care Dashboard"
-        description={`${bundle.orgName} · KPI từ selectors · Campaign + Automation tách biệt`}
+        title="Bảng điều khiển"
+        description={`${bundle.orgName} · KPI chăm sóc · Chiến dịch tách khỏi luồng tự động`}
       />
 
       {/* A. Business Snapshot */}
@@ -57,7 +58,7 @@ export default function DashboardPage() {
           id="dash-a"
           className="mb-2 text-xs font-bold tracking-wide text-slate-500 uppercase"
         >
-          A · Business Snapshot
+          A · Ảnh chụp kinh doanh
         </h2>
         <div className="grid grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-6">
           <StatCard label="Tổng khách" metric={m.totalCustomers} href="/customers" />
@@ -73,7 +74,7 @@ export default function DashboardPage() {
             href="/retention/inactive"
           />
           <StatCard label="Lịch sắp tới" metric={m.upcomingBookings} href="/bookings" />
-          <StatCard label="Task quá hạn" metric={m.overdueTasks} href="/tasks" />
+          <StatCard label="Việc quá hạn" metric={m.overdueTasks} href="/tasks" />
         </div>
       </section>
 
@@ -83,7 +84,7 @@ export default function DashboardPage() {
           id="dash-b"
           className="mb-2 text-xs font-bold tracking-wide text-slate-500 uppercase"
         >
-          B · Customer Growth
+          B · Tăng trưởng khách
         </h2>
         <OpsCharts bundle={bundle} />
       </section>
@@ -94,7 +95,7 @@ export default function DashboardPage() {
           id="dash-c"
           className="mb-2 text-xs font-bold tracking-wide text-slate-500 uppercase"
         >
-          C · Retention Insights
+          C · Giữ chân khách
         </h2>
         <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
           <StatCard label="Tỷ lệ tái đặt" metric={m.rebookingRate} href="/reports/retention" />
@@ -118,11 +119,11 @@ export default function DashboardPage() {
           id="dash-d"
           className="mb-2 text-xs font-bold tracking-wide text-slate-500 uppercase"
         >
-          D · Customer Care Today
+          D · Chăm sóc hôm nay
         </h2>
         <Card className="overflow-hidden">
           {careToday.length === 0 ? (
-            <p className="p-4 text-sm text-slate-500">Không có việc care hôm nay.</p>
+            <p className="p-4 text-sm text-slate-500">Không có việc chăm sóc hôm nay.</p>
           ) : (
             <ul className="divide-y divide-slate-100">
               {careToday.map((row) => (
@@ -158,14 +159,14 @@ export default function DashboardPage() {
           id="dash-e"
           className="mb-2 text-xs font-bold tracking-wide text-slate-500 uppercase"
         >
-          E · Automation Health
+          E · Sức khỏe tự động
         </h2>
         <div className="grid grid-cols-2 gap-2 md:grid-cols-5">
-          <StatCard label="WF active" metric={wf.active} href="/automations" />
-          <StatCard label="Run hôm nay" metric={wf.executionsToday} href="/automations/runs" />
-          <StatCard label="Run OK" metric={wf.succeeded} href="/automations/runs" />
-          <StatCard label="Run lỗi" metric={wf.failed} href="/automations/runs" />
-          <StatCard label="Task mở" metric={m.openTasks} href="/care" />
+          <StatCard label="Luồng đang chạy" metric={wf.active} href="/automations" />
+          <StatCard label="Lần chạy hôm nay" metric={wf.executionsToday} href="/automations/runs" />
+          <StatCard label="Chạy thành công" metric={wf.succeeded} href="/automations/runs" />
+          <StatCard label="Chạy lỗi" metric={wf.failed} href="/automations/runs" />
+          <StatCard label="Việc đang mở" metric={m.openTasks} href="/care" />
         </div>
       </section>
 
@@ -175,26 +176,26 @@ export default function DashboardPage() {
           id="dash-f"
           className="mb-2 text-xs font-bold tracking-wide text-slate-500 uppercase"
         >
-          F · Zalo & Campaign
+          F · Zalo & chiến dịch
         </h2>
         <div className="grid grid-cols-2 gap-2 md:grid-cols-5">
-          <StatCard label="Zalo sent" metric={m.messagesSent} href="/communication/history" />
-          <StatCard label="Zalo failed" metric={m.messagesFailed} href="/communication/history" />
+          <StatCard label="Zalo đã gửi" metric={m.messagesSent} href="/communication/history" />
+          <StatCard label="Zalo lỗi" metric={m.messagesFailed} href="/communication/history" />
           <StatCard
-            label="Campaigns"
+            label="Chiến dịch"
             metric={{
               available: true,
               value: camp.total,
-              definition: "Tổng campaign",
+              definition: "Tổng chiến dịch",
             }}
             href="/campaigns"
           />
           <StatCard
-            label="Camp sent"
+            label="Chiến dịch đã gửi"
             metric={{
               available: true,
               value: camp.sent,
-              definition: "Sent từ campaign",
+              definition: "Số tin đã gửi từ chiến dịch",
             }}
             href="/campaigns/analytics"
           />
@@ -206,7 +207,7 @@ export default function DashboardPage() {
               href="/settings/zalo"
               className="text-xs font-semibold text-[var(--brand-600)]"
             >
-              OA settings
+              Cài đặt OA
             </Link>
           </Card>
         </div>
@@ -304,7 +305,7 @@ export default function DashboardPage() {
             })}
           />
           <InsightList
-            title="Automation thất bại"
+            title="Tự động chạy lỗi"
             href="/automations/runs"
             items={failed.map((r) => ({
               id: r.id,
@@ -315,7 +316,7 @@ export default function DashboardPage() {
             }))}
           />
           <InsightList
-            title="Zalo failed"
+            title="Zalo lỗi"
             href="/communication/history"
             items={failedMsg.map((msg) => {
               const c = bundle.customers.find((x) => x.id === msg.customerId);

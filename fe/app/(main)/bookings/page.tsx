@@ -11,6 +11,7 @@ import { ScheduleTechDay } from "@/components/bookings/schedule-tech-day";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { BookingsPageSkeleton, CalendarSkeleton } from "@/components/ui/skeleton";
 import { formatDateTime } from "@/lib/utils";
 import { useAppStore } from "@/stores/app-store";
 import type { Booking, BookingStatus } from "@/lib/types";
@@ -22,11 +23,7 @@ const ScheduleCalendar = dynamic(
     ),
   {
     ssr: false,
-    loading: () => (
-      <div className="flex h-full items-center justify-center bg-white text-sm text-slate-500">
-        Đang tải lịch…
-      </div>
-    ),
+    loading: () => <CalendarSkeleton />,
   },
 );
 
@@ -133,7 +130,7 @@ export default function BookingsPage() {
       .sort((a, b) => a.scheduledAt.localeCompare(b.scheduledAt));
   }, [bundle, q, status, branchId, techFilter]);
 
-  if (!bundle) return null;
+  if (!bundle) return <BookingsPageSkeleton />;
 
   const selected = bundle.bookings.find((b) => b.id === selectedId) ?? null;
   const selectedCustomer = selected

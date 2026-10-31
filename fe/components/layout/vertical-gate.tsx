@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { AppShellSkeleton } from "@/components/ui/skeleton";
 import { useAppStore } from "@/stores/app-store";
 
 export function VerticalGate({ children }: { children: React.ReactNode }) {
@@ -28,11 +29,7 @@ export function VerticalGate({ children }: { children: React.ReactNode }) {
   }, [hydrated, verticalId, pathname, router]);
 
   if (!hydrated) {
-    return (
-      <div className="flex min-h-svh items-center justify-center bg-[var(--background)] text-sm text-slate-500">
-        Đang tải…
-      </div>
-    );
+    return <AppShellSkeleton />;
   }
 
   return <>{children}</>;

@@ -1,6 +1,7 @@
 "use client";
 
 import { AppShell } from "@/components/layout/app-shell";
+import { AppShellSkeleton } from "@/components/ui/skeleton";
 import { useAppStore } from "@/stores/app-store";
 
 export default function MainLayout({
@@ -12,11 +13,7 @@ export default function MainLayout({
   const hydrated = useAppStore((s) => s.hydrated);
 
   if (!hydrated || !verticalId) {
-    return (
-      <div className="flex min-h-svh items-center justify-center text-sm text-slate-500">
-        Đang chuyển hướng…
-      </div>
-    );
+    return <AppShellSkeleton />;
   }
 
   return <AppShell>{children}</AppShell>;

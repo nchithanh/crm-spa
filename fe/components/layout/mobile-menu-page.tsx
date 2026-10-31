@@ -101,7 +101,7 @@ export function MobileMenuPage() {
         {(
           [
             { id: "ops" as const, label: "Vận hành" },
-            { id: "growth" as const, label: "Growth" },
+            { id: "growth" as const, label: "Tăng trưởng" },
             { id: "system" as const, label: "Hệ thống" },
           ] as const
         ).map((t) => (
