@@ -24,6 +24,14 @@ Dùng **chỉ** cho chrome:
 
 Helper CSS: `.text-debt` `.text-gain` `.bg-debt-soft` · Badge map trong `components/ui/badge.tsx`.
 
+## Shell (tham chiếu POS + CRM)
+
+- **Sidebar desktop (`lg+`, 260px):** nền trắng; BrandMark + «DOLPHIN BEAUTY»; nhóm **luôn mở** + scroll (không accordion); CN trong sidebar; footer avatar + đổi lĩnh vực. Active: `--brand-50` + rail trái `--brand-500`.
+- **Header desktop:** search (Enter → `/customers?q=`) · CTA primary chữ **trắng** trên indigo (**Đặt lịch** · **Gửi Zalo**) · outline **Khách mới** · **Báo cáo** · chuông. Không breadcrumb.
+- **Sidebar thứ tự:** Lịch hẹn → Khách → Chăm sóc → Zalo → Tổng quan → Marketing → Giữ chân → Báo cáo → Hệ thống.
+- **`/bookings`:** một toolbar; mặc định tuần; tháng `dayMaxEvents=3`; event `HH:mm · Tên KH`; Ops chỉ khi chọn.
+- **Mobile:** dock POS-like giữ nguyên (logo · Khách · Lịch giữa · Việc · Menu).
+
 ## Radius
 
 - Card / panel: ~10–16px  

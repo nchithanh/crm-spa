@@ -43,6 +43,7 @@ SoT: `lib/nav.ts` (`NAV_GROUPS`, `MOBILE_DOCK`).
 
 ## Shell
 
-- Desktop: sidebar collapsible 8 nhóm (hầu hết route đủ mock).
-- Topbar: search Enter → `/customers?q=` · branch select (UI) · bell stub · Zalo badge.
-- Mobile dock: Tổng quan (logo) · Khách · Lịch · Việc · Menu.
+- Desktop: sidebar 260px · BrandMark · nhóm luôn mở theo thứ tự lễ tân (Lịch → Khách → Chăm sóc → Zalo → Tổng quan → Marketing → Giữ chân → Báo cáo → Hệ thống) · CN · user footer (POS-like).
+- Header: search · CTA primary chữ trắng Đặt lịch / Gửi Zalo · outline Khách mới / Báo cáo · chuông.
+- `/bookings`: toolbar gộp · mặc định tuần · Ops panel khi chọn / đặt mới.
+- Mobile dock: Tổng quan (logo) · Khách · Lịch · Việc · Menu. `/menu` Vận hành gồm nhóm Zalo.

@@ -2,20 +2,31 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ChevronDown, Bell, Search } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import {
+  Bell,
+  CalendarDays,
+  MessageSquare,
+  Search,
+  UserPlus,
+  BarChart3,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import { BrandMark } from "@/components/brand-mark";
 import { MobileBottomDock } from "@/components/layout/mobile-bottom-dock";
 import { PersistBridge } from "@/components/layout/persist-bridge";
 import { Button } from "@/components/ui/button";
 import {
   NAV_GROUPS,
   SwitchVerticalIcon,
-  findNavGroupId,
-  findNavLabel,
   isNavActive,
 } from "@/lib/nav";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/stores/app-store";
+
+const ctaPrimary =
+  "inline-flex h-10 min-h-10 items-center justify-center gap-1.5 rounded-xl bg-[var(--brand-500)] px-3.5 text-sm font-semibold !text-white hover:bg-[var(--brand-600)] hover:!text-white";
+const ctaOutline =
+  "inline-flex h-10 min-h-10 items-center justify-center gap-1.5 rounded-xl border border-[var(--brand-300)] bg-white px-3.5 text-sm font-semibold !text-[var(--brand-600)] hover:bg-[var(--brand-50)] hover:!text-[var(--brand-600)]";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -28,24 +39,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const failedRuns =
     bundle?.runs.filter((r) => r.status === "failed").length ?? 0;
 
-  const activeGroup = findNavGroupId(pathname);
-  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
-
+  const [branchId, setBranchId] = useState("all");
   useEffect(() => {
-    if (!activeGroup) return;
-    setOpenGroups((prev) =>
-      prev[activeGroup] ? prev : { ...prev, [activeGroup]: true },
-    );
-  }, [activeGroup]);
-
-  const [branchId, setBranchId] = useState<string>("all");
-  useEffect(() => {
-    if (bundle?.branches[0] && branchId === "all") {
-      /* keep all as default */
-    }
-  }, [bundle, branchId]);
-
-  const pageTitle = useMemo(() => findNavLabel(pathname), [pathname]);
+    if (typeof window === "undefined") return;
+    const saved = window.sessionStorage.getItem("beauty-branch");
+    if (saved) setBranchId(saved);
+  }, []);
 
   const badgeFor = (key?: "tasks" | "runs") => {
     if (key === "tasks" && openTasks > 0) return openTasks;
@@ -53,101 +52,121 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return null;
   };
 
-  const NavLinks = () => (
-    <nav className="flex flex-col gap-1 p-2">
-      {NAV_GROUPS.map((group) => {
-        const expanded = openGroups[group.id] ?? group.id === "overview";
-        return (
-          <div key={group.id} className="mb-1">
-            <button
-              type="button"
-              onClick={() =>
-                setOpenGroups((p) => ({
-                  ...p,
-                  [group.id]: !expanded,
-                }))
-              }
-              className="flex w-full items-center justify-between rounded-[10px] px-2.5 py-1.5 text-[10px] font-bold tracking-wider text-slate-400 uppercase hover:bg-slate-50"
-            >
-              {group.label}
-              <ChevronDown
-                size={14}
-                className={cn(
-                  "transition text-slate-400",
-                  expanded && "rotate-180",
-                )}
-              />
-            </button>
-            {expanded ? (
-              <div className="mt-0.5 flex flex-col gap-0.5">
-                {group.items.map((item) => {
-                  const active = isNavActive(item.href, pathname);
-                  const Icon = item.icon;
-                  const badge = badgeFor(item.badgeKey);
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={cn(
-                        "relative flex min-h-9 items-center gap-2.5 rounded-[10px] px-2.5 py-1.5 text-[13px] font-medium",
-                        active
-                          ? "bg-[var(--brand-50)] text-[var(--brand-700)]"
-                          : "text-slate-600 hover:bg-slate-50",
-                      )}
-                    >
-                      {active ? (
-                        <span className="absolute top-1/2 left-0 h-4 w-1 -translate-y-1/2 rounded-r-full bg-[var(--brand-500)]" />
-                      ) : null}
-                      <Icon
-                        size={15}
-                        className={
-                          active ? "text-[var(--brand-600)]" : "text-slate-400"
-                        }
-                      />
-                      <span className="min-w-0 flex-1 truncate">
-                        {item.label}
-                        {item.stub ? (
-                          <span className="ml-1 text-[9px] font-normal text-slate-400">
-                            stub
-                          </span>
-                        ) : null}
-                      </span>
-                      {badge ? (
-                        <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--brand-500)] px-1.5 text-[10px] font-bold text-white">
-                          {badge}
-                        </span>
-                      ) : null}
-                    </Link>
-                  );
-                })}
-              </div>
-            ) : null}
-          </div>
-        );
-      })}
-    </nav>
-  );
+  const setBranch = (id: string) => {
+    setBranchId(id);
+    if (typeof window !== "undefined") {
+      window.sessionStorage.setItem("beauty-branch", id);
+    }
+  };
 
   return (
     <div className="min-h-svh bg-[var(--background)] text-slate-900">
       <PersistBridge />
       <div className="flex min-h-svh w-full">
-        <aside className="sticky top-0 hidden h-svh w-60 shrink-0 flex-col border-r border-slate-200 bg-white lg:flex">
-          <div className="border-b border-slate-200 px-4 py-3">
-            <p className="text-[10px] font-semibold tracking-wide text-[var(--brand-600)] uppercase">
-              Dolphin Beauty CRM
-            </p>
-            <p className="mt-0.5 truncate text-sm font-bold leading-tight">
-              {bundle?.orgName ?? "—"}
-            </p>
-            <p className="text-[11px] text-slate-500">
-              {bundle?.label} · {bundle?.currentUserName}
-            </p>
-          </div>
-          <div className="flex-1 overflow-y-auto">
-            <NavLinks />
-          </div>
-          <div className="border-t border-slate-200 p-2">
+        <aside className="sticky top-0 hidden h-svh w-[260px] shrink-0 flex-col border-r border-[var(--border)] bg-[var(--card)] lg:flex">
+          <Link
+            href="/"
+            className="flex shrink-0 items-center gap-2.5 px-5 py-5 hover:bg-[var(--brand-50)]"
+          >
+            <BrandMark className="h-10 w-10" />
+            <span className="min-w-0">
+              <span className="block text-sm font-bold tracking-wide text-[var(--brand-600)]">
+                DOLPHIN BEAUTY
+              </span>
+              <span className="block truncate text-xs text-slate-400">
+                {bundle?.orgName ?? "CRM"}
+              </span>
+            </span>
+          </Link>
+
+          {bundle?.branches?.length ? (
+            <div className="px-3 pb-3">
+              <p className="mb-1 px-3 text-[11px] font-bold tracking-wide text-slate-400 uppercase">
+                Chi nhánh
+              </p>
+              <select
+                className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium"
+                value={branchId}
+                onChange={(e) => setBranch(e.target.value)}
+                aria-label="Chi nhánh"
+              >
+                <option value="all">Tất cả CN</option>
+                {bundle.branches.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : null}
+
+          <nav className="min-h-0 flex-1 space-y-3 overflow-y-auto px-3 pb-4">
+            {NAV_GROUPS.map((group) => (
+              <div key={group.id}>
+                <p className="mb-1 px-3 text-[11px] font-bold tracking-wide text-slate-400 uppercase">
+                  {group.label}
+                </p>
+                <div className="space-y-0.5">
+                  {group.items.map((item) => {
+                    const active = isNavActive(item.href, pathname);
+                    const Icon = item.icon;
+                    const badge = badgeFor(item.badgeKey);
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className={cn(
+                          "relative flex min-h-11 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium",
+                          active
+                            ? "bg-[var(--brand-50)] font-semibold text-[var(--brand-700)]"
+                            : "text-slate-600 hover:bg-slate-50",
+                        )}
+                      >
+                        {active ? (
+                          <span className="absolute top-1/2 left-0 h-5 w-1 -translate-y-1/2 rounded-r-full bg-[var(--brand-500)]" />
+                        ) : null}
+                        <Icon
+                          size={18}
+                          className={
+                            active ? "text-[var(--brand-600)]" : "text-slate-400"
+                          }
+                        />
+                        <span className="min-w-0 flex-1 truncate">
+                          {item.label}
+                        </span>
+                        {badge ? (
+                          <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--brand-500)] px-1.5 text-[10px] font-bold text-white">
+                            {badge}
+                          </span>
+                        ) : null}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </nav>
+
+          <div className="shrink-0 border-t border-[var(--border)] p-3">
+            <div className="mb-2 flex min-w-0 items-center gap-2.5">
+              <div
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--brand-500)] text-xs font-bold text-white"
+                aria-hidden
+              >
+                {(bundle?.currentUserName ?? "D")
+                  .trim()
+                  .charAt(0)
+                  .toUpperCase()}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold leading-tight">
+                  {bundle?.currentUserName ?? "Demo"}
+                </p>
+                <p className="truncate text-xs text-slate-400">
+                  {bundle?.label} · CSKH
+                </p>
+              </div>
+            </div>
             <Button
               variant="ghost"
               size="sm"
@@ -164,86 +183,57 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </aside>
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur">
-            <div className="flex items-center gap-3 px-4 py-2.5 lg:px-5">
-              <div className="relative hidden min-w-0 flex-1 md:block md:max-w-sm">
-                <Search
-                  size={14}
-                  className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-slate-400"
-                />
-                <input
-                  type="search"
-                  placeholder="Tìm khách, mã, SĐT…"
-                  className="h-9 w-full rounded-xl border border-slate-200 bg-slate-50 pr-3 pl-9 text-sm outline-none focus:border-[var(--brand-500)] focus:bg-white"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      const q = (e.target as HTMLInputElement).value.trim();
-                      router.push(
-                        q
-                          ? `/customers?q=${encodeURIComponent(q)}`
-                          : "/customers",
-                      );
-                    }
-                  }}
-                />
-              </div>
-              <div className="min-w-0 flex-1 md:flex-none">
-                <p className="truncate text-sm font-semibold lg:hidden">
-                  {bundle?.orgName}
-                </p>
-                <p className="hidden text-xs text-slate-500 lg:block">
-                  {pageTitle}
-                </p>
-              </div>
-              {bundle?.branches?.length ? (
-                <select
-                  className="hidden h-9 max-w-[10rem] rounded-xl border border-slate-200 bg-white px-2 text-xs font-medium sm:block"
-                  value={branchId}
-                  onChange={(e) => setBranchId(e.target.value)}
-                  aria-label="Chi nhánh"
-                >
-                  <option value="all">Tất cả CN</option>
-                  {bundle.branches.map((b) => (
-                    <option key={b.id} value={b.id}>
-                      {b.name}
-                    </option>
-                  ))}
-                </select>
-              ) : null}
-              <button
-                type="button"
-                className="relative inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 text-slate-500"
-                aria-label="Thông báo (mock)"
-                title="Thông báo — stub"
-              >
-                <Bell size={16} />
-                <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-rose-500" />
-              </button>
-              <span
-                className={cn(
-                  "rounded-full px-2.5 py-1 text-[11px] font-semibold",
-                  bundle?.zaloConnected
-                    ? "bg-emerald-50 text-emerald-700"
-                    : "bg-rose-50 text-rose-700",
-                )}
-              >
-                Zalo {bundle?.zaloConnected ? "OK" : "Off"}
-              </span>
+          <header className="sticky top-0 z-20 flex flex-wrap items-center gap-2 border-b border-[var(--border)] bg-[var(--card)]/95 px-3 py-2.5 backdrop-blur sm:px-5">
+            <div className="relative min-w-0 flex-1 lg:max-w-md">
+              <Search
+                size={16}
+                className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-slate-400"
+              />
+              <input
+                type="search"
+                placeholder="Tìm khách, mã, SĐT…"
+                className="h-10 w-full rounded-xl border border-transparent bg-[var(--brand-50)] pr-3 pl-9 text-sm outline-none focus:border-[var(--brand-500)] focus:bg-white"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    const q = (e.target as HTMLInputElement).value.trim();
+                    router.push(
+                      q
+                        ? `/customers?q=${encodeURIComponent(q)}`
+                        : "/customers",
+                    );
+                  }
+                }}
+              />
             </div>
-            <nav
-              aria-label="Breadcrumb"
-              className="flex items-center gap-1.5 border-t border-slate-100 px-4 py-1.5 text-[11px] text-slate-500 lg:px-5"
-            >
-              <Link href="/" className="hover:text-[var(--brand-600)]">
-                Tổng quan
+
+            <div className="ml-auto hidden items-center gap-2 lg:flex">
+              <Link href="/bookings" className={ctaPrimary}>
+                <CalendarDays size={16} />
+                Đặt lịch
               </Link>
-              {pathname !== "/" ? (
-                <>
-                  <span aria-hidden>/</span>
-                  <span className="font-medium text-slate-800">{pageTitle}</span>
-                </>
-              ) : null}
-            </nav>
+              <Link href="/communication" className={ctaPrimary}>
+                <MessageSquare size={16} />
+                Gửi Zalo
+              </Link>
+              <Link href="/customers/new" className={ctaOutline}>
+                <UserPlus size={16} />
+                Khách mới
+              </Link>
+              <Link href="/reports" className={ctaOutline}>
+                <BarChart3 size={16} />
+                Báo cáo
+              </Link>
+            </div>
+
+            <button
+              type="button"
+              className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl text-slate-500 hover:bg-[var(--brand-50)]"
+              aria-label="Thông báo (mock)"
+              title="Thông báo — stub"
+            >
+              <Bell size={18} />
+              <span className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full bg-rose-500" />
+            </button>
           </header>
 
           <main className="flex-1 px-4 py-4 max-lg:pb-[calc(6.75rem+max(0.625rem,env(safe-area-inset-bottom)))] sm:px-5 sm:py-5 lg:pb-5">

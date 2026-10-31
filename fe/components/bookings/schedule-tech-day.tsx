@@ -23,7 +23,7 @@ export function ScheduleTechDay({
   shifts,
   selectedId,
   onSelect,
-  onChangeDate,
+  onChangeDate: _onChangeDate,
 }: {
   date: string; // YYYY-MM-DD
   bookings: Booking[];
@@ -40,43 +40,10 @@ export function ScheduleTechDay({
     .sort((a, b) => a.scheduledAt.localeCompare(b.scheduledAt));
 
   const unassigned = dayBookings.filter((b) => !b.technicianId);
-
-  function shiftDay(delta: number) {
-    const d = new Date(`${date}T12:00:00`);
-    d.setDate(d.getDate() + delta);
-    onChangeDate(d.toISOString().slice(0, 10));
-  }
+  void _onChangeDate;
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-white">
-      <div className="flex items-center justify-between gap-2 border-b border-slate-100 px-3 py-2">
-        <button
-          type="button"
-          className="rounded-full px-3 py-1 text-xs font-semibold bg-slate-100"
-          onClick={() => shiftDay(-1)}
-        >
-          ← Trước
-        </button>
-        <div className="text-center">
-          <p className="text-[10px] font-bold tracking-wide text-[var(--brand-600)] uppercase">
-            Lịch theo KTV
-          </p>
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => onChangeDate(e.target.value)}
-            className="text-sm font-bold text-slate-900 outline-none"
-          />
-        </div>
-        <button
-          type="button"
-          className="rounded-full px-3 py-1 text-xs font-semibold bg-slate-100"
-          onClick={() => shiftDay(1)}
-        >
-          Sau →
-        </button>
-      </div>
-
       <div className="min-h-0 flex-1 overflow-x-auto overflow-y-auto p-3">
         <div
           className="grid min-w-[40rem] gap-3"
@@ -119,11 +86,11 @@ export function ScheduleTechDay({
                             onClick={() => onSelect(b.id)}
                             className={`w-full rounded-[10px] border px-2.5 py-2 text-left transition ${
                               active
-                                ? "border-[var(--brand-400)] bg-[var(--brand-50)]"
-                                : "border-slate-100 bg-white hover:border-brand"
+                                ? "border-emerald-400 bg-emerald-50"
+                                : "border-slate-100 bg-white hover:border-emerald-200"
                             }`}
                           >
-                            <p className="text-[11px] font-semibold text-[var(--brand-700)]">
+                            <p className="text-[11px] font-semibold text-emerald-700">
                               {formatDateTime(b.scheduledAt).split(" ").pop()}
                               {b.durationMinutes
                                 ? ` · ${b.durationMinutes}′`

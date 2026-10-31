@@ -20,7 +20,7 @@ export function MobileMenuPage() {
   const failedRuns =
     bundle?.runs.filter((r) => r.status === "failed").length ?? 0;
 
-  const opsIds = new Set(["overview", "customers", "care", "ops"]);
+  const opsIds = new Set(["ops", "customers", "care", "zalo", "overview"]);
   const growthIds = new Set(["marketing", "retention", "reports"]);
   const systemIds = new Set(["system"]);
 

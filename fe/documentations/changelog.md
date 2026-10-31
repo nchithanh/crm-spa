@@ -2,6 +2,17 @@
 
 SoT nhật ký runtime FE. Product planning cũ: `docs/product/dolphin-beauty-crm/06-planning/fe-wave1-changelog.md` (legacy; ưu tiên file này khi coding).
 
+## 2026-10-31 — CTA trắng · nav lễ tân · lịch gọn
+
+- Primary CTA (`Button` default, header Đặt lịch / Gửi Zalo, nút FullCalendar): chữ **trắng** (`!text-white` / `#fff`) — không inherit `text-slate-900`.
+- Sidebar desktop: thứ tự **Lịch hẹn → Khách → Chăm sóc → Zalo → Tổng quan → Marketing → Giữ chân → Báo cáo → Hệ thống**.
+- `/bookings`: mặc định tuần + lọc Tất cả; toolbar một hàng (Ngày/Tuần/Tháng/KTV + ngày + lọc + Đặt lịch); tháng tối đa 3 event/ô (+N); title `HH:mm · Tên KH`; panel Ops chỉ khi chọn lịch hoặc đặt mới. `/menu` tab Vận hành gồm nhóm Zalo.
+
+## 2026-10-31 — Shell desktop (POS + CRM)
+
+- Sidebar: 260px, BrandMark, nhóm luôn mở, CN, footer user — bỏ accordion / breadcrumb.
+- Header CTA: Đặt lịch · Gửi Zalo (primary) · Khách mới · Báo cáo (outline).
+
 ## 2026-10-31 — GitHub Pages (`nchithanh/crm-spa`)
 
 - Nested repo `products/saas/crm-spa` → `https://github.com/nchithanh/crm-spa.git`

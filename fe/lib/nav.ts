@@ -58,33 +58,39 @@ export type NavGroup = {
   items: NavItem[];
 };
 
-/** IA 8 nhóm — Pass 1: stub routes có EmptyState */
+/** IA desktop — ưu tiên thao tác lễ tân / NV spa hàng ngày */
 export const NAV_GROUPS: NavGroup[] = [
   {
-    id: "overview",
-    label: "Tổng quan",
+    id: "ops",
+    label: "Lịch hẹn & Dịch vụ",
     items: [
       {
-        href: "/",
-        label: "Dashboard",
-        icon: LayoutDashboard,
+        href: "/bookings",
+        label: "Lịch hẹn",
+        icon: CalendarDays,
         mobilePrimary: true,
-        mobileLabel: "Tổng quan",
+        mobileLabel: "Lịch",
       },
       {
-        href: "/insights",
-        label: "Customer Insights",
-        icon: PieChart,
+        href: "/bookings/history",
+        label: "Lịch sử sử dụng DV",
+        icon: History,
       },
       {
-        href: "/today",
-        label: "Hoạt động hôm nay",
-        icon: Activity,
+        href: "/packages",
+        label: "Liệu trình / gói còn lại",
+        icon: Package,
+      },
+      { href: "/services", label: "Dịch vụ (catalog)", icon: Sparkles },
+      {
+        href: "/bookings/cancelled",
+        label: "Hủy / bỏ lỡ",
+        icon: CalendarX2,
       },
       {
-        href: "/alerts",
-        label: "Cảnh báo & cơ hội",
-        icon: AlertTriangle,
+        href: "/bookings/rebooking",
+        label: "Chưa tái đặt lịch",
+        icon: CalendarOff,
       },
     ],
   },
@@ -170,6 +176,51 @@ export const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
+    id: "zalo",
+    label: "Zalo",
+    items: [
+      { href: "/communication", label: "Zalo Center", icon: MessageSquare },
+      {
+        href: "/communication/templates",
+        label: "Mẫu tin nhắn",
+        icon: MessageSquare,
+      },
+      {
+        href: "/communication/history",
+        label: "Lịch sử gửi tin",
+        icon: History,
+      },
+    ],
+  },
+  {
+    id: "overview",
+    label: "Tổng quan",
+    items: [
+      {
+        href: "/",
+        label: "Dashboard",
+        icon: LayoutDashboard,
+        mobilePrimary: true,
+        mobileLabel: "Tổng quan",
+      },
+      {
+        href: "/insights",
+        label: "Customer Insights",
+        icon: PieChart,
+      },
+      {
+        href: "/today",
+        label: "Hoạt động hôm nay",
+        icon: Activity,
+      },
+      {
+        href: "/alerts",
+        label: "Cảnh báo & cơ hội",
+        icon: AlertTriangle,
+      },
+    ],
+  },
+  {
     id: "marketing",
     label: "Marketing & Automation",
     items: [
@@ -185,16 +236,6 @@ export const NAV_GROUPS: NavGroup[] = [
         icon: Target,
       },
       {
-        href: "/communication/templates",
-        label: "Mẫu tin nhắn",
-        icon: MessageSquare,
-      },
-      {
-        href: "/communication/history",
-        label: "Lịch sử gửi tin",
-        icon: History,
-      },
-      {
         href: "/campaigns/analytics",
         label: "Phân tích chiến dịch",
         icon: BarChart3,
@@ -203,41 +244,6 @@ export const NAV_GROUPS: NavGroup[] = [
         href: "/care/scripts",
         label: "Kịch bản chăm sóc mẫu",
         icon: ClipboardList,
-      },
-      { href: "/communication", label: "Zalo Center", icon: MessageSquare },
-    ],
-  },
-  {
-    id: "ops",
-    label: "Lịch hẹn & Dịch vụ",
-    items: [
-      {
-        href: "/bookings",
-        label: "Lịch hẹn",
-        icon: CalendarDays,
-        mobilePrimary: true,
-        mobileLabel: "Lịch",
-      },
-      {
-        href: "/bookings/history",
-        label: "Lịch sử sử dụng DV",
-        icon: History,
-      },
-      {
-        href: "/packages",
-        label: "Liệu trình / gói còn lại",
-        icon: Package,
-      },
-      { href: "/services", label: "Dịch vụ (catalog)", icon: Sparkles },
-      {
-        href: "/bookings/cancelled",
-        label: "Hủy / bỏ lỡ",
-        icon: CalendarX2,
-      },
-      {
-        href: "/bookings/rebooking",
-        label: "Chưa tái đặt lịch",
-        icon: CalendarOff,
       },
     ],
   },

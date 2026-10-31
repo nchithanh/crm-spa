@@ -17,11 +17,11 @@ FE-first CRM cho **Spa · Nails · Salon** (Massage = profile/docs sau; FE khôn
 ## Entry
 
 1. `/chon-linh-vuc` → chọn Spa / Nails / Salon.
-2. Shell: sidebar **8 nhóm collapsible** (`lg+`) · topbar (search → `/customers?q=` · CN · noti stub · Zalo) · breadcrumb · mobile dock + `/menu`.
+2. Shell: sidebar nhóm luôn mở (`lg+`, POS-like) · header CTA nhanh chữ trắng (CRM-like) · mobile dock + `/menu`.
 
-## IA (Pass 1)
+## IA (desktop — ưu tiên lễ tân)
 
-Tổng quan · Khách hàng · Chăm sóc · Marketing & Automation · Lịch hẹn & DV · Giữ chân · Báo cáo · Hệ thống.
+Lịch hẹn & DV · Khách hàng · Chăm sóc · **Zalo** · Tổng quan · Marketing & Automation · Giữ chân · Báo cáo · Hệ thống.
 
 Nhiều route **stub** (`ModuleStub`) — đã vào menu, nghiệp vụ đầy đủ ở phase sau. SoT menu: `lib/nav.ts` (`NAV_GROUPS`).
 

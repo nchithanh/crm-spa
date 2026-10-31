@@ -2,9 +2,11 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { CalendarDays, Columns3, Plus, Search, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { ChevronLeft, ChevronRight, Columns3, Plus, Search, X } from "lucide-react";
+import { useCallback, useMemo, useRef, useState } from "react";
+import type { CalendarApi } from "@fullcalendar/core";
 import { BookingForm } from "@/components/bookings/booking-form";
+import type { CalendarView } from "@/components/bookings/schedule-calendar";
 import { ScheduleTechDay } from "@/components/bookings/schedule-tech-day";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -28,8 +30,48 @@ const ScheduleCalendar = dynamic(
   },
 );
 
-type StatusFilter = "all" | BookingStatus;
-type CanvasMode = "calendar" | "tech";
+const LIVE_STATUSES = new Set<BookingStatus>([
+  "upcoming",
+  "confirmed",
+  "in_service",
+]);
+
+type StatusFilter = "live" | "all" | BookingStatus;
+type CanvasMode = "day" | "week" | "month" | "tech";
+
+const VIEW_PILLS: { id: CanvasMode; label: string; icon?: typeof Columns3 }[] = [
+  { id: "day", label: "Ngày" },
+  { id: "week", label: "Tuần" },
+  { id: "month", label: "Tháng" },
+  { id: "tech", label: "KTV", icon: Columns3 },
+];
+
+function toCalendarView(mode: CanvasMode): CalendarView {
+  if (mode === "day") return "timeGridDay";
+  if (mode === "month") return "dayGridMonth";
+  return "timeGridWeek";
+}
+
+function formatTitle(date: Date, mode: CanvasMode) {
+  if (mode === "tech" || mode === "day") {
+    return date.toLocaleDateString("vi-VN", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  }
+  if (mode === "month") {
+    return date.toLocaleDateString("vi-VN", { month: "long", year: "numeric" });
+  }
+  return date.toLocaleDateString("vi-VN", { month: "long", year: "numeric" });
+}
+
+function shiftIsoDate(iso: string, days: number) {
+  const d = new Date(`${iso}T12:00:00`);
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+}
 
 export default function BookingsPage() {
   const bundle = useAppStore((s) => s.bundle);
@@ -42,13 +84,21 @@ export default function BookingsPage() {
   const [status, setStatus] = useState<StatusFilter>("all");
   const [branchId, setBranchId] = useState<string | "all">("all");
   const [techFilter, setTechFilter] = useState<string | "all">("all");
-  const [mode, setMode] = useState<CanvasMode>("tech");
+  const [mode, setMode] = useState<CanvasMode>("week");
   const [techDate, setTechDate] = useState(() =>
     new Date().toISOString().slice(0, 10),
   );
+  const [cursorDate, setCursorDate] = useState(() => new Date());
+  const [calTitle, setCalTitle] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [note, setNote] = useState("");
   const [showBook, setShowBook] = useState(false);
+  const calApiRef = useRef<CalendarApi | null>(null);
+
+  const onApi = useCallback((api: CalendarApi) => {
+    calApiRef.current = api;
+    setCursorDate(api.getDate());
+  }, []);
 
   const techs = useMemo(
     () => (bundle?.team ?? []).filter((t) => t.role === "technician"),
@@ -59,7 +109,11 @@ export default function BookingsPage() {
     if (!bundle) return [];
     const needle = q.trim().toLowerCase();
     return bundle.bookings
-      .filter((b) => (status === "all" ? true : b.status === status))
+      .filter((b) => {
+        if (status === "all") return true;
+        if (status === "live") return LIVE_STATUSES.has(b.status);
+        return b.status === status;
+      })
       .filter((b) => (branchId === "all" ? true : b.branchId === branchId))
       .filter((b) =>
         techFilter === "all" ? true : b.technicianId === techFilter,
@@ -98,7 +152,13 @@ export default function BookingsPage() {
     ? bundle.resources.find((r) => r.id === selected.resourceId)
     : null;
 
+  const showOps = Boolean(selected || showBook);
+  const titleDate = mode === "tech" ? new Date(`${techDate}T12:00:00`) : cursorDate;
+  const toolbarTitle =
+    mode === "tech" || !calTitle ? formatTitle(titleDate, mode) : calTitle;
+
   const statusChips: { id: StatusFilter; label: string }[] = [
+    { id: "live", label: "Ca tới" },
     { id: "all", label: "Tất cả" },
     { id: "upcoming", label: "Sắp tới" },
     { id: "confirmed", label: "Đã XN" },
@@ -108,36 +168,157 @@ export default function BookingsPage() {
     { id: "cancelled", label: "Huỷ" },
   ];
 
+  function goToday() {
+    if (mode === "tech") {
+      setTechDate(new Date().toISOString().slice(0, 10));
+      return;
+    }
+    calApiRef.current?.today();
+    setCursorDate(calApiRef.current?.getDate() ?? new Date());
+  }
+
+  function goPrev() {
+    if (mode === "tech") {
+      setTechDate((d) => shiftIsoDate(d, -1));
+      return;
+    }
+    calApiRef.current?.prev();
+    setCursorDate(calApiRef.current?.getDate() ?? cursorDate);
+  }
+
+  function goNext() {
+    if (mode === "tech") {
+      setTechDate((d) => shiftIsoDate(d, 1));
+      return;
+    }
+    calApiRef.current?.next();
+    setCursorDate(calApiRef.current?.getDate() ?? cursorDate);
+  }
+
   return (
     <div className="-mx-4 -my-4 flex h-[calc(100svh-4.25rem-5.75rem)] flex-col max-lg:h-[calc(100svh-4.25rem-6.75rem)] sm:-mx-5 sm:-my-5 lg:h-[calc(100svh-4.25rem)]">
+      <div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-slate-200 bg-white px-3 py-2">
+        <div className="flex rounded-xl bg-slate-100 p-0.5">
+          {VIEW_PILLS.map((pill) => {
+            const Icon = pill.icon;
+            const active = mode === pill.id;
+            return (
+              <button
+                key={pill.id}
+                type="button"
+                onClick={() => setMode(pill.id)}
+                className={`inline-flex h-8 items-center gap-1 rounded-[10px] px-2.5 text-[11px] font-semibold ${
+                  active
+                    ? "bg-[var(--brand-500)] text-white"
+                    : "text-slate-500 hover:text-slate-800"
+                }`}
+              >
+                {Icon ? <Icon size={13} /> : null}
+                {pill.label}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            aria-label="Trước"
+            onClick={goPrev}
+            className="inline-flex h-8 w-8 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100"
+          >
+            <ChevronLeft size={16} />
+          </button>
+          <p className="min-w-[8.5rem] text-center text-sm font-bold text-slate-900">
+            {toolbarTitle}
+          </p>
+          <button
+            type="button"
+            aria-label="Sau"
+            onClick={goNext}
+            className="inline-flex h-8 w-8 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100"
+          >
+            <ChevronRight size={16} />
+          </button>
+          <button
+            type="button"
+            onClick={goToday}
+            className="h-8 rounded-xl px-2.5 text-[11px] font-semibold text-[var(--brand-600)] hover:bg-[var(--brand-50)]"
+          >
+            Hôm nay
+          </button>
+        </div>
+
+        <label className="relative min-w-[10rem] flex-1 lg:max-w-xs">
+          <Search
+            size={14}
+            className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-slate-400"
+          />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Tìm KH, DV, KTV…"
+            className="h-8 w-full rounded-xl border border-slate-200 bg-slate-50 pr-7 pl-8 text-xs outline-none focus:border-[var(--brand-400)] focus:bg-white"
+          />
+          {q ? (
+            <button
+              type="button"
+              className="absolute top-1/2 right-2 -translate-y-1/2 text-slate-400"
+              onClick={() => setQ("")}
+              aria-label="Xoá"
+            >
+              <X size={14} />
+            </button>
+          ) : null}
+        </label>
+
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value as StatusFilter)}
+          className="h-8 rounded-xl border border-slate-200 bg-white px-2 text-xs font-semibold text-slate-700"
+        >
+          {statusChips.map((chip) => (
+            <option key={chip.id} value={chip.id}>
+              {chip.label}
+            </option>
+          ))}
+        </select>
+        <select
+          value={techFilter}
+          onChange={(e) => setTechFilter(e.target.value)}
+          className="h-8 max-w-[8rem] rounded-xl border border-slate-200 bg-white px-2 text-xs font-semibold text-slate-700"
+        >
+          <option value="all">Mọi KTV</option>
+          {techs.map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.name}
+            </option>
+          ))}
+        </select>
+        <select
+          value={branchId}
+          onChange={(e) => setBranchId(e.target.value)}
+          className="h-8 max-w-[8rem] rounded-xl border border-slate-200 bg-white px-2 text-xs font-semibold text-slate-700"
+        >
+          <option value="all">Mọi CN</option>
+          {bundle.branches.map((br) => (
+            <option key={br.id} value={br.id}>
+              {br.name}
+            </option>
+          ))}
+        </select>
+
+        <Button
+          size="sm"
+          className="ml-auto"
+          onClick={() => setShowBook((v) => !v)}
+        >
+          <Plus size={14} /> Đặt lịch
+        </Button>
+      </div>
+
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-slate-200 lg:flex-row">
         <section className="relative min-h-[42svh] min-w-0 flex-1 bg-white lg:min-h-0">
-          <div className="absolute top-3 left-3 z-10 flex rounded-full bg-white p-0.5 shadow-sm ring-1 ring-slate-200">
-            <button
-              type="button"
-              aria-label="Theo KTV"
-              onClick={() => setMode("tech")}
-              className={`flex h-8 items-center gap-1 rounded-full px-2.5 text-[11px] font-semibold ${
-                mode === "tech"
-                  ? "bg-[var(--brand-500)] text-white"
-                  : "text-slate-500"
-              }`}
-            >
-              <Columns3 size={14} /> KTV
-            </button>
-            <button
-              type="button"
-              aria-label="Lịch tháng"
-              onClick={() => setMode("calendar")}
-              className={`flex h-8 items-center gap-1 rounded-full px-2.5 text-[11px] font-semibold ${
-                mode === "calendar"
-                  ? "bg-[var(--brand-500)] text-white"
-                  : "text-slate-500"
-              }`}
-            >
-              <CalendarDays size={14} /> Tháng
-            </button>
-          </div>
           {mode === "tech" ? (
             <ScheduleTechDay
               date={techDate}
@@ -152,328 +333,187 @@ export default function BookingsPage() {
             />
           ) : (
             <ScheduleCalendar
+              view={toCalendarView(mode)}
               bookings={filtered}
               customers={bundle.customers}
               technicians={techs}
               onSelect={setSelectedId}
+              onApi={onApi}
+              onTitle={setCalTitle}
             />
           )}
         </section>
 
-        <aside className="maps-panel flex max-h-[48svh] w-full shrink-0 flex-col overflow-hidden border-t border-slate-200 bg-white lg:max-h-none lg:w-[22.5rem] lg:border-t-0 lg:border-l">
-          <div className="border-b border-slate-100 px-3 pt-3 pb-2">
-            <div className="mb-2 flex items-start justify-between gap-2">
-              <div>
-                <p className="text-[10px] font-bold tracking-wider text-[var(--brand-600)] uppercase">
-                  Lịch hẹn · Ops
-                </p>
-                <h1 className="text-base font-bold text-slate-900">
-                  {filtered.length} lịch
-                </h1>
-              </div>
-              <Button size="sm" onClick={() => setShowBook((v) => !v)}>
-                <Plus size={14} /> Đặt lịch
-              </Button>
-            </div>
-
-            {showBook ? (
-              <Card className="mb-2 p-3">
-                <BookingForm
-                  onDone={(id) => {
-                    setSelectedId(id);
-                    setShowBook(false);
-                    setNote("Đã tạo lịch từ catalog");
-                  }}
-                />
-              </Card>
-            ) : null}
-
-            <label className="relative block">
-              <Search
-                size={14}
-                className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-slate-400"
-              />
-              <input
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                placeholder="Tìm KH, DV, KTV…"
-                className="h-9 w-full rounded-full border border-slate-200 bg-slate-50 pr-8 pl-8 text-sm outline-none focus:border-[var(--brand-400)] focus:bg-white"
-              />
-              {q ? (
-                <button
-                  type="button"
-                  className="absolute top-1/2 right-2 -translate-y-1/2 text-slate-400"
-                  onClick={() => setQ("")}
-                  aria-label="Xoá"
-                >
-                  <X size={14} />
-                </button>
-              ) : null}
-            </label>
-
-            <div className="mt-2 flex gap-1.5 overflow-x-auto pb-1">
-              {statusChips.map((chip) => (
-                <button
-                  key={chip.id}
-                  type="button"
-                  onClick={() => setStatus(chip.id)}
-                  className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold whitespace-nowrap ${
-                    status === chip.id
-                      ? "bg-[var(--brand-500)] text-white"
-                      : "bg-slate-100 text-slate-600"
-                  }`}
-                >
-                  {chip.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="mt-1.5 flex gap-1.5 overflow-x-auto pb-0.5">
-              <button
-                type="button"
-                onClick={() => setTechFilter("all")}
-                className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-                  techFilter === "all"
-                    ? "bg-slate-800 text-white"
-                    : "bg-slate-50 text-slate-600 ring-1 ring-slate-200"
-                }`}
-              >
-                Mọi KTV
-              </button>
-              {techs.map((t) => (
-                <button
-                  key={t.id}
-                  type="button"
-                  onClick={() =>
-                    setTechFilter((prev) => (prev === t.id ? "all" : t.id))
-                  }
-                  className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-                    techFilter === t.id
-                      ? "bg-slate-800 text-white"
-                      : "bg-slate-50 text-slate-600 ring-1 ring-slate-200"
-                  }`}
-                >
-                  {t.name}
-                </button>
-              ))}
-            </div>
-
-            <div className="mt-1.5 flex gap-1.5 overflow-x-auto pb-0.5">
-              <button
-                type="button"
-                onClick={() => setBranchId("all")}
-                className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-                  branchId === "all"
-                    ? "bg-[var(--brand-100)] text-[var(--brand-700)]"
-                    : "bg-slate-50 text-slate-600 ring-1 ring-slate-200"
-                }`}
-              >
-                Mọi CN
-              </button>
-              {bundle.branches.map((br) => (
-                <button
-                  key={br.id}
-                  type="button"
-                  onClick={() =>
-                    setBranchId((prev) => (prev === br.id ? "all" : br.id))
-                  }
-                  className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-                    branchId === br.id
-                      ? "bg-[var(--brand-100)] text-[var(--brand-700)]"
-                      : "bg-slate-50 text-slate-600 ring-1 ring-slate-200"
-                  }`}
-                >
-                  {br.name}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {note ? (
-            <div className="border-b border-[var(--brand-100)] bg-[var(--brand-50)] px-3 py-2 text-xs text-[var(--brand-700)]">
-              {note}{" "}
-              <Link
-                href="/automations/runs"
-                className="font-semibold underline"
-              >
-                Executions
-              </Link>
-            </div>
-          ) : null}
-
-          <ul className="min-h-0 flex-1 overflow-y-auto">
-            {filtered.length === 0 ? (
-              <li className="px-4 py-8 text-center text-sm text-slate-500">
-                Không có lịch khớp bộ lọc.
-              </li>
-            ) : (
-              filtered.slice(0, 80).map((b) => listRow(b))
-            )}
-          </ul>
-
-          {selected ? (
-            <div className="border-t border-slate-200 bg-white px-3 py-3">
+        {showOps ? (
+          <aside className="maps-panel flex max-h-[48svh] w-full shrink-0 flex-col overflow-hidden border-t border-slate-200 bg-white lg:max-h-none lg:w-[22.5rem] lg:border-t-0 lg:border-l">
+            <div className="border-b border-slate-100 px-3 pt-3 pb-2">
               <div className="mb-2 flex items-start justify-between gap-2">
                 <div>
-                  <p className="text-sm font-bold">{selected.serviceName}</p>
-                  <p className="text-xs text-slate-500">
-                    {formatDateTime(selected.scheduledAt)}
-                    {selected.durationMinutes
-                      ? ` · ${selected.durationMinutes}′`
-                      : ""}
+                  <p className="text-[10px] font-bold tracking-wider text-[var(--brand-600)] uppercase">
+                    Lịch hẹn · Ops
                   </p>
-                  <p className="text-xs text-slate-500">
-                    {selectedBranch?.name} · {selectedCustomer?.fullName}
-                  </p>
-                  <p className="text-xs text-slate-500">
-                    KTV: {selectedTech?.name ?? "—"}
-                    {selectedRes ? ` · ${selectedRes.name}` : ""}
-                  </p>
-                  {selectedPkg ? (
-                    <p className="text-xs font-semibold text-[var(--brand-700)]">
-                      Gói: còn {selectedPkg.remainingSessions}/
-                      {selectedPkg.totalSessions}
-                    </p>
-                  ) : null}
-                  {selected.aftercareNote ? (
-                    <p className="mt-1 text-xs text-slate-600">
-                      Aftercare: {selected.aftercareNote}
-                    </p>
-                  ) : null}
-                  <div className="mt-1">
-                    <Badge status={selected.status} />
-                  </div>
+                  <h1 className="text-base font-bold text-slate-900">
+                    {selected ? selected.serviceName : "Đặt lịch mới"}
+                  </h1>
                 </div>
                 <button
                   type="button"
                   aria-label="Đóng"
                   className="text-slate-400"
-                  onClick={() => setSelectedId(null)}
+                  onClick={() => {
+                    setSelectedId(null);
+                    setShowBook(false);
+                  }}
                 >
                   <X size={16} />
                 </button>
               </div>
-              <Link
-                href={`/customers/${selected.customerId}`}
-                className="mb-2 block text-xs font-semibold text-[var(--brand-600)] underline"
-              >
-                Mở Customer 360
-              </Link>
-              <div className="mb-2 flex flex-wrap gap-1">
-                {(
-                  [
-                    ["confirmed", "XN"],
-                    ["in_service", "Đang làm"],
-                    ["completed", "Xong"],
-                    ["no_show", "No-show"],
-                    ["cancelled", "Huỷ"],
-                  ] as const
-                ).map(([st, label]) => (
+
+              {showBook ? (
+                <Card className="mb-2 p-3">
+                  <BookingForm
+                    onDone={(id) => {
+                      setSelectedId(id);
+                      setShowBook(false);
+                      setNote("Đã tạo lịch từ catalog");
+                    }}
+                  />
+                </Card>
+              ) : null}
+            </div>
+
+            {note ? (
+              <div className="border-b border-[var(--brand-100)] bg-[var(--brand-50)] px-3 py-2 text-xs text-[var(--brand-700)]">
+                {note}{" "}
+                <Link
+                  href="/automations/runs"
+                  className="font-semibold underline"
+                >
+                  Executions
+                </Link>
+              </div>
+            ) : null}
+
+            {selected ? (
+              <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3">
+                <p className="text-xs text-slate-500">
+                  {formatDateTime(selected.scheduledAt)}
+                  {selected.durationMinutes
+                    ? ` · ${selected.durationMinutes}′`
+                    : ""}
+                </p>
+                <p className="text-xs text-slate-500">
+                  {selectedBranch?.name} · {selectedCustomer?.fullName}
+                </p>
+                <p className="text-xs text-slate-500">
+                  KTV: {selectedTech?.name ?? "—"}
+                  {selectedRes ? ` · ${selectedRes.name}` : ""}
+                </p>
+                {selectedPkg ? (
+                  <p className="text-xs font-semibold text-emerald-700">
+                    Gói: còn {selectedPkg.remainingSessions}/
+                    {selectedPkg.totalSessions}
+                  </p>
+                ) : null}
+                {selected.aftercareNote ? (
+                  <p className="mt-1 text-xs text-slate-600">
+                    Aftercare: {selected.aftercareNote}
+                  </p>
+                ) : null}
+                <div className="mt-1">
+                  <Badge status={selected.status} />
+                </div>
+                <Link
+                  href={`/customers/${selected.customerId}`}
+                  className="mt-2 block text-xs font-semibold text-[var(--brand-600)] underline"
+                >
+                  Mở Customer 360
+                </Link>
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {(
+                    [
+                      ["confirmed", "XN"],
+                      ["in_service", "Đang làm"],
+                      ["completed", "Xong"],
+                      ["no_show", "No-show"],
+                      ["cancelled", "Huỷ"],
+                    ] as const
+                  ).map(([st, label]) => (
+                    <Button
+                      key={st}
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        if (st === "completed") {
+                          const n = simulateBookingEvent(
+                            selected.id,
+                            "booking.completed",
+                          );
+                          setNote(
+                            `Hoàn thành (+ trừ gói nếu có) · ${n} workflow`,
+                          );
+                          return;
+                        }
+                        if (st === "cancelled") {
+                          const n = simulateBookingEvent(
+                            selected.id,
+                            "booking.cancelled",
+                          );
+                          setNote(`Huỷ · ${n} workflow`);
+                          return;
+                        }
+                        updateBookingStatus(selected.id, st);
+                        setNote(`Đổi status → ${st}`);
+                      }}
+                    >
+                      {label}
+                    </Button>
+                  ))}
+                </div>
+                <div className="mt-2 space-y-1">
+                  <p className="text-[11px] font-semibold text-slate-500">
+                    Ghi chú sau liệu trình
+                  </p>
+                  <input
+                    className="h-9 w-full rounded-xl border border-slate-200 px-2 text-xs"
+                    placeholder="VD: Da ổn, nhắc chống nắng…"
+                    value={aftercareDraft}
+                    onChange={(e) => setAftercareDraft(e.target.value)}
+                    onFocus={() =>
+                      setAftercareDraft(selected.aftercareNote ?? "")
+                    }
+                  />
                   <Button
-                    key={st}
                     size="sm"
                     variant="outline"
                     onClick={() => {
-                      if (st === "completed") {
-                        const n = simulateBookingEvent(
-                          selected.id,
-                          "booking.completed",
-                        );
-                        setNote(
-                          `Hoàn thành (+ trừ gói nếu có) · ${n} workflow`,
-                        );
-                        return;
-                      }
-                      if (st === "cancelled") {
-                        const n = simulateBookingEvent(
-                          selected.id,
-                          "booking.cancelled",
-                        );
-                        setNote(`Huỷ · ${n} workflow`);
-                        return;
-                      }
-                      updateBookingStatus(selected.id, st);
-                      setNote(`Đổi status → ${st}`);
+                      setAftercareNote(selected.id, aftercareDraft.trim());
+                      setNote("Đã lưu ghi chú aftercare");
                     }}
                   >
-                    {label}
+                    Lưu ghi chú
                   </Button>
-                ))}
+                </div>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => {
+                      const n = simulateBookingEvent(
+                        selected.id,
+                        "booking.created",
+                      );
+                      setNote(`booking.created → ${n} workflow`);
+                    }}
+                  >
+                    Sim created
+                  </Button>
+                </div>
               </div>
-              <div className="mb-2 space-y-1">
-                <p className="text-[11px] font-semibold text-slate-500">
-                  Ghi chú sau liệu trình
-                </p>
-                <input
-                  className="h-9 w-full rounded-[10px] border border-slate-200 px-2 text-xs"
-                  placeholder="VD: Da ổn, nhắc chống nắng…"
-                  value={aftercareDraft}
-                  onChange={(e) => setAftercareDraft(e.target.value)}
-                  onFocus={() =>
-                    setAftercareDraft(selected.aftercareNote ?? "")
-                  }
-                />
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    setAftercareNote(selected.id, aftercareDraft.trim());
-                    setNote("Đã lưu ghi chú aftercare");
-                  }}
-                >
-                  Lưu ghi chú
-                </Button>
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={() => {
-                    const n = simulateBookingEvent(
-                      selected.id,
-                      "booking.created",
-                    );
-                    setNote(`booking.created → ${n} workflow`);
-                  }}
-                >
-                  Sim created
-                </Button>
-              </div>
-            </div>
-          ) : null}
-        </aside>
+            ) : null}
+          </aside>
+        ) : null}
       </div>
     </div>
   );
-
-  function listRow(b: Booking) {
-    const c = bundle!.customers.find((x) => x.id === b.customerId);
-    const tech = bundle!.team.find((t) => t.id === b.technicianId);
-    const active = selectedId === b.id;
-    return (
-      <li key={b.id} className="border-b border-slate-50">
-        <button
-          type="button"
-          onClick={() => setSelectedId(b.id)}
-          className={`flex w-full flex-col gap-1 px-3 py-3 text-left transition ${
-            active ? "bg-[var(--brand-50)]" : "hover:bg-slate-50"
-          }`}
-        >
-          <div className="flex items-start justify-between gap-2">
-            <p className="text-sm font-semibold text-slate-900">
-              {b.serviceName}
-            </p>
-            <Badge status={b.status} />
-          </div>
-          <p className="text-xs font-medium text-[var(--brand-700)]">
-            {c?.fullName ?? "—"}
-          </p>
-          <p className="text-[11px] text-slate-500">
-            {formatDateTime(b.scheduledAt)}
-            {tech ? ` · ${tech.name}` : ""}
-          </p>
-        </button>
-      </li>
-    );
-  }
 }
