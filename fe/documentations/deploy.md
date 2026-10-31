@@ -8,21 +8,21 @@ Workflow: `.github/workflows/deploy-pages.yml` (repo root)
 
 - Trigger: push `main` hoặc `workflow_dispatch`
 - Working directory: `fe/`
-- Build: `GITHUB_PAGES=true GITHUB_PAGES_BASE_PATH=/crm-spa npm run build:pages` → `fe/out/`
+- Build: `GITHUB_PAGES=true npm run build:pages` → `fe/out/` (`assetPrefix` / `basePath` **rỗng** vì custom domain là root)
 - Deploy: GitHub Actions `deploy-pages`
 
 ## GitHub (1 lần)
 
 1. Repo **Settings → Pages → Build and deployment → Source: GitHub Actions**
-2. (Tuỳ chọn) Custom domain Cloudflare → bỏ `GITHUB_PAGES_BASE_PATH` trong workflow (`basePath` rỗng)
+2. Custom domain Cloudflare: `crm-spa.dolphin-software.io.vn` — **không** set `GITHUB_PAGES_BASE_PATH` (file nằm ở `/_next/...`, không `/crm-spa/_next/...`)
 3. Bật **Enforce HTTPS** khi certificate sẵn sàng
 
 ## URL
 
 | Giai đoạn | URL |
 | --- | --- |
-| Project Pages | https://nchithanh.github.io/crm-spa/ — CI đang set `GITHUB_PAGES_BASE_PATH=/crm-spa` |
-| Custom domain | `https://<fqdn>/` — xoá env `GITHUB_PAGES_BASE_PATH` |
+| Custom domain (SoT) | https://crm-spa.dolphin-software.io.vn/ |
+| Project Pages | https://nchithanh.github.io/crm-spa/ — 301 về custom domain |
 
 ## Local artifact (giống CI)
 

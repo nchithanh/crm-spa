@@ -2,6 +2,11 @@
 
 SoT nhật ký runtime FE. Product planning cũ: `docs/product/dolphin-beauty-crm/06-planning/fe-wave1-changelog.md` (legacy; ưu tiên file này khi coding).
 
+## 2026-10-31 — Pages custom domain (bỏ `/crm-spa` prefix)
+
+- Custom domain `crm-spa.dolphin-software.io.vn` phục vụ artifact ở **root**.
+- Bỏ `GITHUB_PAGES_BASE_PATH=/crm-spa` trong workflow — HTML không còn trỏ `/crm-spa/_next/...` (404). CSS/JS: `/_next/static/...`.
+
 ## 2026-10-31 — CTA trắng · nav lễ tân · lịch gọn
 
 - Primary CTA (`Button` default, header Đặt lịch / Gửi Zalo, nút FullCalendar): chữ **trắng** (`!text-white` / `#fff`) — không inherit `text-slate-900`.
