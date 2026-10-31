@@ -1,0 +1,150 @@
+@import "tailwindcss";
+
+/* FullCalendar denser SaaS look — brand chỉ trên chrome nút */
+.fc {
+  --fc-border-color: #e2e8f0;
+  --fc-button-bg-color: #5d5cc4;
+  --fc-button-border-color: #5d5cc4;
+  --fc-button-hover-bg-color: #4a49a3;
+  --fc-button-hover-border-color: #4a49a3;
+  --fc-button-active-bg-color: #3d3c8a;
+  --fc-button-active-border-color: #3d3c8a;
+  --fc-today-bg-color: #f8fafc;
+  font-size: 0.8125rem;
+}
+.fc .fc-toolbar-title {
+  font-size: 1rem;
+  font-weight: 700;
+}
+.fc .fc-button {
+  border-radius: 12px !important;
+  text-transform: none !important;
+  box-shadow: none !important;
+  padding: 0.25rem 0.75rem !important;
+}
+.fc .fc-event {
+  border-radius: 6px;
+  border: none;
+  padding: 1px 4px;
+}
+
+/* Maps-style floating panel */
+.maps-panel {
+  box-shadow:
+    0 1px 2px rgba(60, 64, 67, 0.3),
+    0 2px 6px 2px rgba(60, 64, 67, 0.15);
+}
+
+/* Mobile bottom dock — POS-style pill + notch ôm CTA giữa */
+.beauty-mobile-dock-pill--notch {
+  -webkit-mask-image: radial-gradient(
+    circle 42px at 50% -8px,
+    transparent 0,
+    transparent 40px,
+    #000 42px
+  );
+  mask-image: radial-gradient(
+    circle 42px at 50% -8px,
+    transparent 0,
+    transparent 40px,
+    #000 42px
+  );
+}
+
+:root {
+  --background: #f4f6f8;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  /* Brand chrome — CTA / nav active / FAB */
+  --brand-50: #f3f3fb;
+  --brand-100: #e4e4f6;
+  --brand-300: #9b9adc;
+  --brand-400: #7a79d0;
+  --brand-500: #5d5cc4;
+  --brand-600: #4a49a3;
+  --brand-700: #3d3c8a;
+  --brand-950: #1e1e3d;
+  --primary: var(--brand-500);
+  --primary-foreground: #ffffff;
+  /* Semantic — tách khỏi brand */
+  --success: #059669;
+  --success-bg: #ecfdf5;
+  --success-fg: #047857;
+  --warning: #d97706;
+  --warning-bg: #fffbeb;
+  --warning-fg: #b45309;
+  --danger: #e11d48;
+  --danger-bg: #fff1f2;
+  --danger-fg: #be123c;
+  --info: #0284c7;
+  --info-bg: #f0f9ff;
+  --info-fg: #0369a1;
+}
+
+/* Chrome helpers */
+.bg-brand {
+  background-color: var(--brand-500);
+}
+.bg-brand-soft {
+  background-color: var(--brand-50);
+}
+.text-brand {
+  color: var(--brand-600);
+}
+.border-brand {
+  border-color: color-mix(in srgb, var(--brand-500) 35%, transparent);
+}
+.ring-brand {
+  --tw-ring-color: var(--brand-500);
+}
+
+/* Money / P&L / nợ */
+.text-gain {
+  color: var(--success-fg);
+}
+.text-loss,
+.text-debt {
+  color: var(--danger-fg);
+}
+.bg-debt-soft {
+  background-color: var(--danger-bg);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--background);
+  color: var(--foreground);
+  font-family:
+    Geist,
+    Inter,
+    "Be Vietnam Pro",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--brand-500) 28%, transparent) transparent;
+}

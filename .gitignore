@@ -1,0 +1,12 @@
+# Nested repo — FE artifacts
+fe/node_modules/
+fe/.next/
+fe/out/
+fe/.tmp/
+fe/*.tsbuildinfo
+fe/next-env.d.ts
+.DS_Store
+*.log
+.env
+.env.*
+!.env.example
