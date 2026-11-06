@@ -27,8 +27,9 @@ import { validateWorkflowGraph } from "@/lib/workflow-validate";
 import { uid } from "@/lib/utils";
 
 const STORAGE_KEY = "dolphin-beauty-crm-vertical";
-export const BUNDLE_STORAGE_PREFIX = "dolphin-beauty-crm-bundle:";
-export const MOCK_STORE_VERSION = "v2";
+/** Đổi version → bỏ qua localStorage seed cũ (video demo Marketing) */
+export const MOCK_STORE_VERSION = "v3";
+export const BUNDLE_STORAGE_PREFIX = `dolphin-beauty-crm-bundle:${MOCK_STORE_VERSION}:`;
 
 type AppState = {
   hydrated: boolean;

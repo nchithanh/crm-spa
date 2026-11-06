@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Columns3, Plus, Search, X } from "lucide-react";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CalendarApi } from "@fullcalendar/core";
 import { BookingForm } from "@/components/bookings/booking-form";
 import type { CalendarView } from "@/components/bookings/schedule-calendar";
@@ -91,6 +91,20 @@ export default function BookingsPage() {
   const [note, setNote] = useState("");
   const [showBook, setShowBook] = useState(false);
   const calApiRef = useRef<CalendarApi | null>(null);
+
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("new") === "1") {
+      setShowBook(true);
+    }
+    const onNew = () => setShowBook(true);
+    window.addEventListener("beauty:new-booking", onNew);
+    return () => window.removeEventListener("beauty:new-booking", onNew);
+  }, []);
+
+  function closeOps() {
+    setSelectedId(null);
+    setShowBook(false);
+  }
 
   const onApi = useCallback((api: CalendarApi) => {
     calApiRef.current = api;
@@ -342,7 +356,15 @@ export default function BookingsPage() {
         </section>
 
         {showOps ? (
-          <aside className="maps-panel flex max-h-[48svh] w-full shrink-0 flex-col overflow-hidden border-t border-slate-200 bg-white lg:max-h-none lg:w-[22.5rem] lg:border-t-0 lg:border-l">
+          <>
+            <button
+              type="button"
+              aria-label="Đóng"
+              onClick={closeOps}
+              className="fixed inset-0 z-[55] bg-slate-900/40 backdrop-blur-[1px] lg:hidden"
+            />
+            <aside className="maps-panel fixed inset-x-0 bottom-0 z-[60] flex max-h-[92svh] w-full flex-col overflow-y-auto rounded-t-2xl border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)] lg:static lg:inset-auto lg:z-auto lg:max-h-none lg:w-[22.5rem] lg:shrink-0 lg:overflow-hidden lg:rounded-none lg:border-t-0 lg:border-l lg:pb-0">
+            <div className="mx-auto mt-2 h-1 w-10 shrink-0 rounded-full bg-slate-200 lg:hidden" />
             <div className="border-b border-slate-100 px-3 pt-3 pb-2">
               <div className="mb-2 flex items-start justify-between gap-2">
                 <div>
@@ -357,10 +379,7 @@ export default function BookingsPage() {
                   type="button"
                   aria-label="Đóng"
                   className="text-slate-400"
-                  onClick={() => {
-                    setSelectedId(null);
-                    setShowBook(false);
-                  }}
+                  onClick={closeOps}
                 >
                   <X size={16} />
                 </button>
@@ -392,7 +411,7 @@ export default function BookingsPage() {
             ) : null}
 
             {selected ? (
-              <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3">
+              <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3 max-lg:flex-none max-lg:overflow-visible">
                 <p className="text-xs text-slate-500">
                   {formatDateTime(selected.scheduledAt)}
                   {selected.durationMinutes
@@ -508,7 +527,8 @@ export default function BookingsPage() {
                 </div>
               </div>
             ) : null}
-          </aside>
+            </aside>
+          </>
         ) : null}
       </div>
     </div>

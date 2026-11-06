@@ -4,7 +4,7 @@
 
 | Path | Vai trò |
 | --- | --- |
-| `data/spa-dataset.ts` | Dolphin Glow Spa · **≥52 customers** + tasks/bookings/packages/workflows |
+| `data/spa-dataset.ts` | Dolphin Glow Spa · **40 KH / 4 cohort** (mới · thân thiết · VIP · lâu chưa ghé) + segments/campaigns video Marketing |
 | `data/seed.ts` | Nails/Salon thin + `getVerticalBundle` |
 | `data/service-catalog.ts` · `year-bookings.ts` · `ops-extras.ts` · `enrich.ts` | Catalog, bookings năm, resources/shifts/debts |
 
@@ -20,9 +20,14 @@ Store: `createWorkflowDraft` · `cloneWorkflow` · `deleteWorkflow` · `saveWork
 
 ## Campaign + Zalo
 
-`Campaign` / `ActivityLogEntry` trong `lib/types.ts`. Seed Spa 5 campaigns.  
+`Campaign` / `ActivityLogEntry` trong `lib/types.ts`.  
+
+**Spa demo Marketing (video):** 4 segment + 4 campaign chính (welcome −15% · win-back −20% · VIP đặc quyền · thân thiết −10%) + template Zalo tương ứng.  
+
 `lib/campaign-utils.ts` · store: `upsertCampaign` · `deleteCampaign` · `launchCampaign` · `sendZaloMessage` · `toggleZalo` · `togglePos` · `toggleOps` · `pushActivity`.  
-Bundle: `campaigns` · `activityLog` · `opsConnected`.
+Bundle: `campaigns` · `activityLog` · `opsConnected`.  
+
+Persist key: `dolphin-beauty-crm-bundle:v3:{vertical}` — đổi version → bỏ seed localStorage cũ.
 
 ## Segment eval
 

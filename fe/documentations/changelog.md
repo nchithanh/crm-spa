@@ -2,6 +2,38 @@
 
 SoT nhật ký runtime FE. Product planning cũ: `docs/product/dolphin-beauty-crm/06-planning/fe-wave1-changelog.md` (legacy; ưu tiên file này khi coding).
 
+## 2026-11-06 — Theme indigo
+
+- CTA `--brand-500` `#7800CF`; hover `#4B0082`; nhấn `#3D0069`; đậm `#1F0036`.
+- Nút lịch, bóng FAB và stage `confirmed` cùng `#7800CF`. Shell trắng/đen và semantic khác giữ nguyên.
+
+## 2026-11-04 — Palette trắng/đen + CTA theme
+
+- Shell: sidebar `--sidebar` đen; main/header trắng; surface search xám (`--surface-muted`).
+- Theme tím **chỉ** CTA / FAB / Button primary; nav active đen-trắng (không tím).
+- Semantic (warning/status/stage) giữ nguyên, tách brand. Docs design cập nhật.
+
+## 2026-11-04 — Revert theme AMIS-like
+
+- Khôi phục token lavender + brand `#5d4094`, sidebar active glow + rail, dock emerald/FAB tím (trước bản flat AMIS).
+
+## 2026-11-04 — Surface dịu mắt
+
+- `--background` `#f6f5fc`, `--border` `#e7e5f3`, `--brand-50`/`100` dịu hơn; `--card` vẫn trắng.
+- Giảm cảm giác sáng chói trên vùng content (sidebar dark giữ nguyên).
+
+## 2026-11-04 — Sidebar desktop dark
+
+- Menu `lg+`: nền `--brand-950`, item/hover sáng, active brand mờ + rail `--brand-400`.
+- Skeleton sidebar đồng bộ dark. Header / content / dock mobile giữ sáng.
+
+## 2026-11-02 — Mobile tạo mới + Ops bottom sheet
+
+- Header mobile thêm nút **+ Tạo mới** → bottom sheet **Đặt lịch · Gửi Zalo · Khách mới** (desktop vẫn dùng CTA chữ).
+- `/bookings` mobile: panel Ops chuyển thành bottom sheet (backdrop, `max-h-[92svh]`, cuộn được) để tới được nút xác nhận đặt lịch; desktop giữ sidebar.
+- `?new=1` mở thẳng form đặt lịch; nếu đang ở `/bookings` thì mở qua event `beauty:new-booking`.
+- SoT: `components/layout/quick-create.tsx`, `app/(main)/bookings/page.tsx`.
+
 ## 2026-10-31 — Tổng quan full width · search 2 lớp · recents 3×5
 
 - Bỏ `max-w-5xl`: hero + toàn bộ section rộng full content như dashboard gốc; search full width.
@@ -39,6 +71,12 @@ SoT nhật ký runtime FE. Product planning cũ: `docs/product/dolphin-beauty-cr
 - C: KPI đổi lưới 4 cột → 2×2 khi nửa width (`md:grid-cols-4 lg:grid-cols-2`).
 - Dưới `lg`: vẫn xếp dọc, full width.
 - D · Chăm sóc hôm nay: chỉ hiển thị tối đa 4 việc (`slice(0, 4)`).
+
+## 2026-11-03 — Seed Spa Marketing Automation (video)
+
+- 40 KH VN · 4 cohort: mới / thân thiết / VIP / lâu chưa quay lại (tag + spend/visit nhất quán).
+- 4 segment + 4 campaign (+ template Zalo) ưu đãi khác nhau từng nhóm.
+- Persist bundle `v3` — F5 nhận seed mới (hoặc Reset demo).
 
 ## 2026-10-31 — Copy VI · nav 1 active · Tổng quan đầu
 

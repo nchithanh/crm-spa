@@ -16,16 +16,6 @@ export function Skeleton({
   );
 }
 
-function NavRows({ n }: { n: number }) {
-  return (
-    <div className="space-y-1.5 px-3">
-      {Array.from({ length: n }, (_, i) => (
-        <Skeleton key={i} className="h-10 w-full" />
-      ))}
-    </div>
-  );
-}
-
 /** Sidebar + header — khớp AppShell khi hydrate / redirect. */
 export function AppShellSkeleton({
   children,
@@ -39,29 +29,40 @@ export function AppShellSkeleton({
       aria-label="Đang tải"
     >
       <div className="flex min-h-svh w-full">
-        <aside className="sticky top-0 hidden h-svh w-[260px] shrink-0 flex-col border-r border-[var(--border)] bg-[var(--card)] lg:flex">
+        <aside className="sticky top-0 hidden h-svh w-[260px] shrink-0 flex-col border-r border-white/10 bg-[var(--sidebar)] lg:flex">
           <div className="flex items-center gap-2.5 px-5 py-5">
-            <Skeleton className="h-10 w-10 rounded-full bg-[var(--brand-100)]" />
+            <Skeleton className="h-10 w-10 rounded-full bg-white/10" />
             <div className="min-w-0 flex-1 space-y-1.5">
-              <Skeleton className="h-3.5 w-28 bg-[var(--brand-100)]" />
-              <Skeleton className="h-2.5 w-16" />
+              <Skeleton className="h-3.5 w-28 bg-white/15" />
+              <Skeleton className="h-2.5 w-16 bg-white/10" />
             </div>
           </div>
           <div className="px-3 pb-3">
-            <Skeleton className="mb-1.5 ml-3 h-2.5 w-16" />
-            <Skeleton className="h-11 w-full" />
+            <Skeleton className="mb-1.5 ml-3 h-2.5 w-16 bg-white/10" />
+            <Skeleton className="h-11 w-full bg-white/10" />
           </div>
           <div className="min-h-0 flex-1 space-y-4 overflow-hidden px-0 pb-4">
-            <NavRows n={4} />
-            <NavRows n={3} />
-            <NavRows n={3} />
-            <NavRows n={2} />
+            <div className="space-y-1.5 px-3">
+              {Array.from({ length: 4 }, (_, i) => (
+                <Skeleton key={i} className="h-10 w-full bg-white/10" />
+              ))}
+            </div>
+            <div className="space-y-1.5 px-3">
+              {Array.from({ length: 3 }, (_, i) => (
+                <Skeleton key={i} className="h-10 w-full bg-white/10" />
+              ))}
+            </div>
+            <div className="space-y-1.5 px-3">
+              {Array.from({ length: 3 }, (_, i) => (
+                <Skeleton key={i} className="h-10 w-full bg-white/10" />
+              ))}
+            </div>
           </div>
-          <div className="flex items-center gap-2.5 border-t border-[var(--border)] p-3">
-            <Skeleton className="h-9 w-9 rounded-full bg-[var(--brand-100)]" />
+          <div className="flex items-center gap-2.5 border-t border-white/10 p-3">
+            <Skeleton className="h-9 w-9 rounded-full bg-white/15" />
             <div className="min-w-0 flex-1 space-y-1.5">
-              <Skeleton className="h-3 w-24" />
-              <Skeleton className="h-2.5 w-14" />
+              <Skeleton className="h-3 w-24 bg-white/15" />
+              <Skeleton className="h-2.5 w-14 bg-white/10" />
             </div>
           </div>
         </aside>

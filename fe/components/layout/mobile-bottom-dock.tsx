@@ -32,7 +32,7 @@ export function MobileBottomDock({ tasksBadge = 0 }: { tasksBadge?: number }) {
             aria-label={center.label}
             className={cn(
               "absolute top-0 left-1/2 z-20 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-full text-white transition",
-              "shadow-[0_6px_18px_rgba(93,64,148,0.42)]",
+              "shadow-[0_6px_18px_rgba(120,0,207,0.42)]",
               centerActive
                 ? "bg-[var(--brand-600)]"
                 : "bg-[var(--brand-500)]",

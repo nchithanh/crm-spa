@@ -27,7 +27,7 @@ Nhiều route **stub** (`ModuleStub`) — đã vào menu, nghiệp vụ đầy �
 
 ## Mock data
 
-- Spa seed: **≥52 khách** (`data/spa-dataset.ts`), quan hệ bookings/tasks/packages/workflows.
+- Spa seed: **40 khách / 4 cohort Marketing** (`data/spa-dataset.ts`), quan hệ bookings/tasks/packages/workflows/campaigns.
 - Selectors: `lib/selectors.ts` (+ `lib/metrics.ts`) — không hardcode KPI trên widget.
 - Persist: `dolphin-beauty-crm-bundle:{vertical}` · **Reset demo** trong `/settings`.
 - Version helper: `lib/mock-clock.ts` (`MOCK_DATA_VERSION`).

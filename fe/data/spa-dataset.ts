@@ -47,16 +47,6 @@ const TEAM = [
   { id: "tm_5", name: "Chuyên viên My", role: "technician" as const, branchId: "br_spa_2" },
 ];
 
-const FIRST = [
-  "Nguyễn", "Trần", "Lê", "Phạm", "Hoàng", "Huỳnh", "Võ", "Đặng", "Bùi", "Đỗ",
-  "Hồ", "Ngô", "Dương", "Lý", "Đinh",
-];
-const MID = ["Thị", "Văn", "Minh", "Thanh", "Kim", "Quỳnh", ""];
-const LAST = [
-  "Anh", "Hương", "Lan", "Mai", "Hà", "Linh", "Trang", "Nhung", "Vy", "Chi",
-  "Ngọc", "Yến", "Thy", "Phương", "Thảo", "My", "Quân", "Bảo", "Dũng", "Khoa",
-];
-
 const SKINS = ["Khô", "Dầu", "Hỗn hợp", "Nhạy cảm", "Thường"];
 const CONCERNS = ["Mụn", "Thâm", "Lão hóa", "Thiếu ẩm", "Lỗ chân lông", "Sạm nắng"];
 const SERVICES = [
@@ -69,6 +59,56 @@ const SERVICES = [
   "Triệt lông diode",
   "Body scrub",
 ];
+
+/** 40 tên VN — 4 cohort × 10 (video Marketing Automation) */
+const DEMO_NAMES = [
+  // A · Khách mới
+  "Nguyễn Minh Anh",
+  "Trần Thu Hà",
+  "Lê Bảo Châu",
+  "Phạm Khánh Linh",
+  "Hoàng Nhật Mai",
+  "Huỳnh Gia Hân",
+  "Võ Thanh Tú",
+  "Đặng Ngọc Bích",
+  "Bùi Phương Uyên",
+  "Đỗ Quỳnh Anh",
+  // B · Thân thiết
+  "Hồ Lan Hương",
+  "Ngô Mỹ Duyên",
+  "Dương Kim Ngân",
+  "Lý Thanh Trúc",
+  "Đinh Hà My",
+  "Nguyễn Văn Khoa",
+  "Trần Minh Quân",
+  "Lê Thị Hằng",
+  "Phạm Thu Trang",
+  "Hoàng Bảo Ngọc",
+  // C · VIP
+  "Huỳnh Thanh Vy",
+  "Võ Diễm My",
+  "Đặng Quốc Bảo",
+  "Bùi Thảo Nguyên",
+  "Đỗ Minh Châu",
+  "Hồ Ái Linh",
+  "Ngô Khánh Vy",
+  "Dương Nhật Quang",
+  "Lý Thuỳ Dương",
+  "Đinh Mai Phương",
+  // D · Lâu chưa quay lại
+  "Nguyễn Hoàng Yến",
+  "Trần Đức Anh",
+  "Lê Mỹ Linh",
+  "Phạm Hữu Phước",
+  "Hoàng Thùy Trang",
+  "Huỳnh An Nhiên",
+  "Võ Thanh Sơn",
+  "Đặng Kim Chi",
+  "Bùi Hà Vy",
+  "Đỗ Nhật Nam",
+] as const;
+
+type CohortId = "moi" | "than-thiet" | "vip" | "lau-chua-quay";
 
 function iso(daysAgo: number, hour = 10): string {
   const d = new Date();
@@ -88,65 +128,130 @@ function phone(i: number): string {
   return `09${String(10000000 + i * 137).slice(0, 8)}`;
 }
 
-function buildCustomers(): Customer[] {
-  const list: Customer[] = [];
-  for (let i = 1; i <= 52; i++) {
-    const fn = `${FIRST[i % FIRST.length]} ${MID[i % MID.length]} ${LAST[i % LAST.length]}`.replace(/\s+/g, " ").trim();
-    const visits = i % 7 === 0 ? 0 : (i % 11) + 1;
-    const lastDays =
-      i % 5 === 0 ? 75 + (i % 40) : i % 3 === 0 ? 5 + (i % 10) : 12 + (i % 45);
-    const firstDays = lastDays + visits * 18 + 10;
-    const status =
-      i % 9 === 0 ? "inactive" : visits >= 8 || i % 6 === 0 ? "vip" : "active";
-    const tags: string[] = [];
-    if (status === "vip") tags.push("vip");
-    if (visits >= 4) tags.push("lieu-trinh");
-    if (i % 4 === 0) tags.push("da-nhay");
-    if (i % 7 === 0) tags.push("ngung-cham");
-    if (i % 5 === 0) tags.push("sinh-nhat");
-    if (i % 8 === 0) tags.push("goi");
+function cohortOf(index0: number): CohortId {
+  if (index0 < 10) return "moi";
+  if (index0 < 20) return "than-thiet";
+  if (index0 < 30) return "vip";
+  return "lau-chua-quay";
+}
 
-    const sources = [
-      "zalo",
-      "walk_in",
-      "referral",
-      "facebook",
-      "web",
-      "other",
-    ] as const;
+function buildCustomers(): Customer[] {
+  const sources = [
+    "zalo",
+    "walk_in",
+    "referral",
+    "facebook",
+    "web",
+    "other",
+  ] as const;
+  const list: Customer[] = [];
+
+  for (let i = 1; i <= 40; i++) {
+    const idx = i - 1;
+    const cohort = cohortOf(idx);
+    const inCohort = idx % 10;
+    const gender = i % 5 === 0 ? "Nam" : "Nữ";
+
+    let visits: number;
+    let lastDays: number;
+    let firstDays: number;
+    let status: Customer["status"];
+    let spend: number;
+    let tags: string[];
+    let notes: string;
+    let consultation: string;
+
+    if (cohort === "moi") {
+      visits = inCohort < 6 ? 1 : 0;
+      lastDays = 2 + inCohort;
+      firstDays = lastDays;
+      status = "active";
+      spend = visits === 0 ? 0 : 450_000 + inCohort * 80_000;
+      tags = ["moi", "chao-mung"];
+      notes = "Khách mới — ưu tiên follow-up lần 2.";
+      consultation = "Tư vấn lần đầu · quan tâm facial / massage";
+    } else if (cohort === "than-thiet") {
+      visits = 5 + (inCohort % 6); // 5–10
+      lastDays = 7 + (inCohort % 14);
+      firstDays = lastDays + visits * 21 + 30;
+      status = "active";
+      spend = visits * (720_000 + inCohort * 40_000);
+      tags = ["than-thiet", "lieu-trinh"];
+      if (inCohort % 3 === 0) tags.push("goi");
+      notes = "Khách thân thiết — hay đặt cuối tuần.";
+      consultation = "Đang liệu trình định kỳ";
+    } else if (cohort === "vip") {
+      visits = 12 + inCohort; // 12–21
+      lastDays = 3 + (inCohort % 10);
+      firstDays = lastDays + visits * 25 + 90;
+      status = "vip";
+      spend = 8_500_000 + inCohort * 1_200_000;
+      tags = ["vip", "lieu-trinh", "dac-quyen"];
+      if (inCohort % 2 === 0) tags.push("goi");
+      notes = "VIP — ưu tiên KTV quen · phòng riêng nếu có.";
+      consultation = "Liệu trình cao cấp · chăm sóc chuyên sâu";
+    } else {
+      visits = 3 + (inCohort % 5); // đã từng dùng DV
+      lastDays = 35 + inCohort * 5; // 35–80 ngày
+      firstDays = lastDays + visits * 30 + 40;
+      status = inCohort >= 7 ? "inactive" : "active";
+      spend = visits * (650_000 + inCohort * 50_000);
+      tags = ["lau-chua-quay", "win-back"];
+      if (status === "inactive") tags.push("ngung-cham");
+      notes = "Lâu chưa quay lại — phù hợp chiến dịch win-back.";
+      consultation = "Từng dùng DV, cần kích hoạt lại";
+    }
+
+    if (inCohort === 0 || inCohort === 5) tags.push("sinh-nhat");
+    if (inCohort % 4 === 0) tags.push("da-nhay");
+
+    const month = String(((idx + 2) % 12) + 1).padStart(2, "0");
+    const day = String((idx % 27) + 1).padStart(2, "0");
+    const year = 1982 + (idx % 18);
+
     list.push({
       id: `cus_spa_${i}`,
       code: `DG-${1000 + i}`,
-      fullName: fn,
+      fullName: DEMO_NAMES[idx]!,
       phone: phone(i),
-      email: i % 3 === 0 ? "" : `khach${i}@email.com`,
-      birthday: `19${80 + (i % 20)}-${String((i % 12) + 1).padStart(2, "0")}-${String((i % 27) + 1).padStart(2, "0")}`,
+      email: i % 4 === 0 ? "" : `khach${i}@email.com`,
+      birthday: `${year}-${month}-${day}`,
       branchId: i % 2 === 0 ? "br_spa_2" : "br_spa_1",
       status,
       tags,
-      notes: i % 4 === 0 ? "Thích phòng yên tĩnh." : "",
+      notes,
       assigneeName: TEAM[i % 3]!.name,
-      consentZalo: i % 7 !== 0,
+      consentZalo: true,
       firstVisitAt: iso(firstDays, 9),
       lastVisitAt: visits === 0 ? iso(firstDays, 9) : iso(lastDays, 11),
       completedServiceCount: visits,
-      totalSpend: visits * (850000 + (i % 5) * 120000),
-      zaloUid: i % 4 === 0 ? "" : `zalo_uid_spa_${1000 + i}`,
+      totalSpend: spend,
+      zaloUid: `zalo_uid_spa_${1000 + i}`,
       source: sources[i % sources.length],
       profile: {
+        gender,
         skinType: SKINS[i % SKINS.length]!,
         skinConcerns: CONCERNS[i % CONCERNS.length]!,
-        allergyNotes: i % 5 === 0 ? "Tránh tinh dầu bạc hà" : i % 11 === 0 ? "Latex" : "Không",
+        allergyNotes:
+          i % 5 === 0 ? "Tránh tinh dầu bạc hà" : i % 11 === 0 ? "Latex" : "Không",
         favoriteServices: SERVICES[i % SERVICES.length]!,
-        consultationNotes:
-          visits >= 4 ? "Đang liệu trình 6 buổi" : "Tư vấn lần đầu",
+        consultationNotes: consultation,
+        segmentLabel:
+          cohort === "moi"
+            ? "Khách hàng mới"
+            : cohort === "than-thiet"
+              ? "Khách hàng thân thiết"
+              : cohort === "vip"
+                ? "Khách VIP"
+                : "Khách lâu chưa quay lại",
       },
     });
-    // Cố ý tạo vài cặp trùng SĐT để demo merge (Pass 2)
-    if (i === 50 || i === 51) {
-      list[list.length - 1]!.phone = phone(3);
-    }
   }
+
+  // Demo merge: hai SĐT trùng
+  list[38]!.phone = phone(3);
+  list[39]!.phone = phone(3);
+
   return list;
 }
 
@@ -158,7 +263,8 @@ export function buildSpaBundle(): VerticalBundle {
       name: "Nhắc lịch spa",
       approval: "approved" as const,
       recipientMode: "uid" as const,
-      preview: "Chào {{name}}, lịch {{service}} lúc {{time}} đang chờ bạn tại Dolphin Glow Spa.",
+      preview:
+        "Chào {{name}}, lịch {{service}} lúc {{time}} đang chờ bạn tại Dolphin Glow Spa.",
     },
     {
       id: "tpl_spa_2",
@@ -172,14 +278,40 @@ export function buildSpaBundle(): VerticalBundle {
       name: "Aftercare facial",
       approval: "approved" as const,
       recipientMode: "uid" as const,
-      preview: "Sau buổi chăm sóc da, hãy uống đủ nước và tránh nắng 24h.",
+      preview:
+        "Sau buổi chăm sóc da, hãy uống đủ nước và tránh nắng 24h — Dolphin Glow Spa.",
     },
     {
-      id: "tpl_spa_4",
-      name: "Win-back 60 ngày",
-      approval: "pending" as const,
+      id: "tpl_spa_welcome",
+      name: "Chào mừng khách mới (−15%)",
+      approval: "approved" as const,
       recipientMode: "uid" as const,
-      preview: "Spa nhớ bạn — ưu đãi quay lại trong tuần này.",
+      preview:
+        "Chào bạn {{name}}! Cảm ơn bạn đã lựa chọn Dolphin Glow Spa. Tặng bạn ưu đãi giảm 15% cho lần trải nghiệm tiếp theo. Đặt lịch ngay hôm nay nhé!",
+    },
+    {
+      id: "tpl_spa_winback",
+      name: "Win-back lâu chưa gặp (−20%)",
+      approval: "approved" as const,
+      recipientMode: "uid" as const,
+      preview:
+        "Chào {{name}}, đã lâu rồi Dolphin Glow Spa chưa được gặp bạn! Chúng mình dành tặng bạn ưu đãi giảm 20% để bạn quay lại thư giãn và chăm sóc bản thân.",
+    },
+    {
+      id: "tpl_spa_vip",
+      name: "Đặc quyền VIP",
+      approval: "approved" as const,
+      recipientMode: "uid" as const,
+      preview:
+        "Chào {{name}}! Cảm ơn bạn đã luôn đồng hành cùng Dolphin Glow Spa. Một đặc quyền chăm sóc chuyên sâu đang dành riêng cho bạn — inbox để nhận lịch VIP.",
+    },
+    {
+      id: "tpl_spa_loyal",
+      name: "Ưu đãi khách thân thiết (−10% + nâng cấp)",
+      approval: "approved" as const,
+      recipientMode: "uid" as const,
+      preview:
+        "Chào {{name}}! Cảm ơn bạn đã tin tưởng Dolphin Glow Spa. Tháng này dành riêng cho khách thân thiết: giảm 10% và nâng cấp liệu trình khi đặt trước cuối tuần.",
     },
   ];
 
@@ -209,8 +341,13 @@ export function buildSpaBundle(): VerticalBundle {
 
   const pkgSvc = catalog.find((s) => s.kind === "package") ?? catalog[0]!;
   const packages: CustomerPackage[] = customers
-    .filter((_, i) => i % 4 === 0 || i % 5 === 0)
-    .slice(0, 12)
+    .filter(
+      (c) =>
+        c.tags.includes("vip") ||
+        c.tags.includes("than-thiet") ||
+        c.tags.includes("goi"),
+    )
+    .slice(0, 14)
     .map((c, idx) => {
       const total = pkgSvc.sessionCount ?? 5;
       const used = idx % 3;
@@ -310,16 +447,30 @@ export function buildSpaBundle(): VerticalBundle {
     });
 
   const messages: MessageLog[] = [];
-  customers.slice(0, 20).forEach((c, idx) => {
+  // Demo video: 6 tin welcome đã gửi + vài tin ops
+  customers
+    .filter((c) => c.tags.includes("moi"))
+    .slice(0, 6)
+    .forEach((c, idx) => {
+      messages.push({
+        id: `msg_spa_welcome_${idx + 1}`,
+        customerId: c.id,
+        templateId: "tpl_spa_welcome",
+        status: "sent",
+        sentAt: iso(0, 9 + idx),
+        error: "",
+        campaignId: "camp_spa_welcome",
+      });
+    });
+  customers.slice(10, 22).forEach((c, idx) => {
     const tpl = templates[idx % 3]!;
-    const fail = !c.zaloUid && tpl.recipientMode === "uid";
     messages.push({
       id: `msg_spa_${idx + 1}`,
       customerId: c.id,
       templateId: tpl.id,
-      status: fail ? "failed" : idx % 7 === 0 ? "pending" : "sent",
-      sentAt: iso(idx % 12, 9),
-      error: fail ? "Thiếu Zalo UID — template yêu cầu UID" : "",
+      status: idx % 7 === 0 ? "pending" : "sent",
+      sentAt: iso(1 + (idx % 10), 9),
+      error: "",
     });
   });
 
@@ -484,48 +635,76 @@ export function buildSpaBundle(): VerticalBundle {
     },
   ];
 
+  const idsByTag = (tag: string) =>
+    customers.filter((c) => c.tags.includes(tag)).map((c) => c.id);
+  const newIds = idsByTag("moi");
+  const loyalIds = idsByTag("than-thiet");
   const vipIds = customers.filter((c) => c.status === "vip").map((c) => c.id);
-  const atRiskIds = customers
-    .filter((c) => c.completedServiceCount >= 1 && c.status !== "inactive")
-    .filter((c) => {
-      const days =
-        (Date.now() - Date.parse(c.lastVisitAt)) / 86_400_000;
-      return days > 60;
-    })
-    .map((c) => c.id);
+  const winbackIds = idsByTag("lau-chua-quay");
 
   const segments: Segment[] = [
     {
-      id: "seg_spa_1",
-      name: "VIP liệu trình",
-      description: "Khách VIP hoặc đang liệu trình",
-      criteriaSummary: ["status = vip OR tags chứa lieu-trinh"],
+      id: "seg_spa_new",
+      name: "Khách hàng mới",
+      description: "Mới đăng ký / mới dùng DV lần đầu — chào mừng & ưu đãi lần 2",
+      criteriaSummary: ["tags chứa moi"],
       criteria: [
-        { id: "c1", field: "customerStatus", op: "eq", value: "vip" },
+        { id: "c_new", field: "tags", op: "contains", value: "moi" },
+      ],
+      memberIds: newIds,
+      matchMode: "and",
+    },
+    {
+      id: "seg_spa_loyal",
+      name: "Khách hàng thân thiết",
+      description: "5–10 lần hoàn thành DV — loyalty / nâng cấp liệu trình",
+      criteriaSummary: ["tags chứa than-thiet"],
+      criteria: [
+        {
+          id: "c_loyal",
+          field: "tags",
+          op: "contains",
+          value: "than-thiet",
+        },
+      ],
+      memberIds: loyalIds,
+      matchMode: "and",
+    },
+    {
+      id: "seg_spa_vip",
+      name: "Khách VIP",
+      description: "Chi tiêu cao · ghé thường xuyên — đặc quyền riêng",
+      criteriaSummary: ["status = vip"],
+      criteria: [
+        { id: "c_vip", field: "customerStatus", op: "eq", value: "vip" },
       ],
       memberIds: vipIds,
+      matchMode: "and",
     },
     {
-      id: "seg_spa_2",
-      name: "Lâu chưa ghé (>60 ngày)",
-      description: "Nguy cơ rời bỏ — cần win-back",
-      criteriaSummary: ["lastVisitAt days_since > 60"],
-      criteria: [
-        { id: "c2", field: "lastVisitAt", op: "days_since_gt", value: "60" },
+      id: "seg_spa_winback",
+      name: "Khách lâu chưa quay lại",
+      description: "Last visit 30–90 ngày — win-back giảm 20%",
+      criteriaSummary: [
+        "tags chứa lau-chua-quay",
+        "lastVisit days_since > 30",
       ],
-      memberIds: atRiskIds,
-    },
-    {
-      id: "seg_spa_3",
-      name: "Sắp sinh nhật",
-      description: "Sinh nhật trong 30 ngày",
-      criteriaSummary: ["birthday within 30 days"],
       criteria: [
-        { id: "c3", field: "birthday", op: "lte", value: "30" },
+        {
+          id: "c_wb_tag",
+          field: "tags",
+          op: "contains",
+          value: "lau-chua-quay",
+        },
+        {
+          id: "c_wb_days",
+          field: "lastVisitAt",
+          op: "days_since_gt",
+          value: "30",
+        },
       ],
-      memberIds: customers
-        .filter((c) => c.tags.includes("sinh-nhat"))
-        .map((c) => c.id),
+      memberIds: winbackIds,
+      matchMode: "and",
     },
   ];
 
@@ -550,69 +729,69 @@ export function buildSpaBundle(): VerticalBundle {
     messages,
     campaigns: [
       {
-        id: "camp_spa_1",
-        name: "Sinh nhật tháng này",
-        kind: "birthday",
-        status: "completed",
-        segmentId: segments.find((s) => s.name.includes("sinh nhật"))?.id ?? segments[0]!.id,
-        templateId: "tpl_spa_3",
-        scheduledAt: "2026-10-20T09:00:00.000Z",
-        sentCount: 8,
-        failedCount: 1,
-        createdAt: "2026-10-18T08:00:00.000Z",
-        note: "Gửi Zalo chúc mừng + ưu đãi facial",
+        id: "camp_spa_welcome",
+        name: "Chào mừng khách hàng mới",
+        kind: "new_service",
+        status: "running",
+        segmentId: "seg_spa_new",
+        templateId: "tpl_spa_welcome",
+        scheduledAt: iso(0, 9),
+        sentCount: 6,
+        failedCount: 0,
+        createdAt: iso(2, 10),
+        note: "Ưu đãi −15% lần tiếp theo · segment Khách hàng mới",
       },
       {
-        id: "camp_spa_2",
-        name: "Win-back >60 ngày",
+        id: "camp_spa_winback",
+        name: "Đã lâu chưa gặp – Ưu đãi dành riêng cho bạn",
         kind: "winback",
-        status: "draft",
-        segmentId: segments[0]!.id,
-        templateId: "tpl_spa_4",
-        scheduledAt: "2026-11-01T09:00:00.000Z",
+        status: "scheduled",
+        segmentId: "seg_spa_winback",
+        templateId: "tpl_spa_winback",
+        scheduledAt: future(1, 10),
         sentCount: 0,
         failedCount: 0,
-        createdAt: "2026-10-28T10:00:00.000Z",
-        note: "Template pending duyệt — chỉ draft",
+        createdAt: iso(1, 11),
+        note: "Ưu đãi −20% · segment lâu chưa quay lại (30–90 ngày)",
       },
       {
-        id: "camp_spa_3",
-        name: "VIP soft launch serum",
+        id: "camp_spa_vip",
+        name: "Đặc quyền dành riêng cho khách VIP",
         kind: "vip",
         status: "scheduled",
-        segmentId: segments.find((s) => s.name.toLowerCase().includes("vip"))?.id ?? segments[0]!.id,
-        templateId: "tpl_spa_1",
-        scheduledAt: "2026-11-05T10:00:00.000Z",
+        segmentId: "seg_spa_vip",
+        templateId: "tpl_spa_vip",
+        scheduledAt: future(2, 10),
         sentCount: 0,
         failedCount: 0,
-        createdAt: "2026-10-29T11:00:00.000Z",
-        note: "Chỉ segment VIP",
+        createdAt: iso(1, 14),
+        note: "Tặng chăm sóc chuyên sâu / lịch VIP · không gửi broadcast chung",
       },
       {
-        id: "camp_spa_4",
+        id: "camp_spa_loyal",
+        name: "Ưu đãi khách hàng thân thiết",
+        kind: "seasonal",
+        status: "draft",
+        segmentId: "seg_spa_loyal",
+        templateId: "tpl_spa_loyal",
+        scheduledAt: future(3, 9),
+        sentCount: 0,
+        failedCount: 0,
+        createdAt: iso(0, 16),
+        note: "−10% + nâng cấp liệu trình · segment thân thiết (5–10 buổi)",
+      },
+      {
+        id: "camp_spa_aftercare",
         name: "Aftercare facial 24h",
         kind: "post_treatment",
         status: "completed",
-        segmentId: segments[0]!.id,
+        segmentId: "seg_spa_loyal",
         templateId: "tpl_spa_3",
-        scheduledAt: "2026-10-15T08:00:00.000Z",
-        sentCount: 12,
-        failedCount: 2,
-        createdAt: "2026-10-14T08:00:00.000Z",
-        note: "Campaign ≠ Automation — gửi batch theo list",
-      },
-      {
-        id: "camp_spa_5",
-        name: "Mùa mưa — gói detox",
-        kind: "seasonal",
-        status: "paused",
-        segmentId: segments[0]!.id,
-        templateId: "tpl_spa_2",
-        scheduledAt: "2026-10-25T09:00:00.000Z",
-        sentCount: 3,
-        failedCount: 0,
-        createdAt: "2026-10-22T09:00:00.000Z",
-        note: "Tạm dừng vì OA test",
+        scheduledAt: iso(10, 8),
+        sentCount: 9,
+        failedCount: 1,
+        createdAt: iso(12, 8),
+        note: "Campaign ≠ Automation — batch aftercare (giữ demo phụ)",
       },
     ],
     runs,
@@ -620,26 +799,34 @@ export function buildSpaBundle(): VerticalBundle {
     activityLog: [
       {
         id: "act_1",
-        at: "2026-10-30T08:00:00.000Z",
+        at: iso(0, 9),
         kind: "campaign",
-        title: "Campaign completed",
-        detail: "Sinh nhật tháng này · 8 sent / 1 failed",
+        title: "Chiến dịch đang chạy",
+        detail: "Chào mừng khách hàng mới · 6 đã gửi · ưu đãi −15%",
         actorName: "Lan CSKH",
       },
       {
         id: "act_2",
-        at: "2026-10-29T14:00:00.000Z",
-        kind: "zalo",
-        title: "OA connected",
-        detail: "Mock connect Dolphin Glow Spa OA",
+        at: iso(1, 11),
+        kind: "campaign",
+        title: "Lên lịch win-back",
+        detail: "Đã lâu chưa gặp · segment 10 khách · ưu đãi −20%",
         actorName: "Lan CSKH",
       },
       {
         id: "act_3",
-        at: "2026-10-28T11:00:00.000Z",
-        kind: "workflow",
-        title: "Workflow activated",
-        detail: "Aftercare facial",
+        at: iso(1, 14),
+        kind: "campaign",
+        title: "Lên lịch đặc quyền VIP",
+        detail: "10 khách VIP · template đặc quyền chăm sóc chuyên sâu",
+        actorName: "Lan CSKH",
+      },
+      {
+        id: "act_4",
+        at: iso(2, 10),
+        kind: "zalo",
+        title: "OA đã kết nối",
+        detail: "Mock connect Dolphin Glow Spa OA",
         actorName: "Lan CSKH",
       },
     ],

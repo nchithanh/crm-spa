@@ -12,7 +12,7 @@ export type CalendarView = "timeGridDay" | "timeGridWeek" | "dayGridMonth";
 
 const STATUS_COLOR: Record<string, string> = {
   upcoming: "#38bdf8",
-  confirmed: "#5d4094",
+  confirmed: "#7800cf",
   in_service: "#7c3aed",
   completed: "#16a34a",
   cancelled: "#e11d48",

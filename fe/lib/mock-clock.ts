@@ -1,5 +1,5 @@
 /** Reference “now” thống nhất cho seed / selectors (mock). */
-export const MOCK_DATA_VERSION = "beauty-crm-mock-v2";
+export const MOCK_DATA_VERSION = "beauty-crm-mock-v3";
 
 export function mockNow(): Date {
   return new Date();

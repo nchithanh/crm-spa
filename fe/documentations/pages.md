@@ -43,9 +43,9 @@ SoT: `lib/nav.ts` (`NAV_GROUPS`, `MOBILE_DOCK`).
 
 ## Shell
 
-- Desktop: sidebar 260px · BrandMark · nhóm luôn mở (**Tổng quan** đầu → Lịch → Khách → Chăm sóc → Zalo → Marketing → Giữ chân → Báo cáo → Hệ thống) · CN · user footer (POS-like). Một mục nav active (`isNavActive` khớp href dài nhất).
-- Header: search · CTA primary chữ trắng Đặt lịch / Gửi Zalo · outline Khách mới / Báo cáo · chuông.
-- `/bookings`: toolbar gộp · mặc định tuần · Ops panel khi chọn / đặt mới.
+- Desktop: sidebar 260px **đen** · main trắng · CTA theme · BrandMark · nhóm luôn mở (**Tổng quan** đầu → Lịch → Khách → Chăm sóc → Zalo → Marketing → Giữ chân → Báo cáo → Hệ thống) · CN · user footer. Một mục nav active (`isNavActive` khớp href dài nhất).
+- Header: search · CTA primary chữ trắng Đặt lịch / Gửi Zalo · outline Khách mới / Báo cáo · chuông. Mobile: nút **+ Tạo mới** (brand) mở bottom sheet **Đặt lịch · Gửi Zalo · Khách mới** (`components/layout/quick-create.tsx`).
+- `/bookings`: toolbar gộp · mặc định tuần · Ops panel khi chọn / đặt mới. Mobile panel là bottom sheet cuộn được; `?new=1` (từ quick-create) mở thẳng form đặt lịch.
 - Loading: `AppShellSkeleton` khi hydrate/redirect; dashboard / lịch dùng khung pulse (`components/ui/skeleton.tsx`).
 - Quick search: `Ctrl K` / `⌘K` (desktop) hoặc pinch 2 ngón (iPad/mobile) hoặc nút **Tìm nhanh** cạnh chuông → popup tìm chức năng / thao tác từ `NAV_GROUPS` + alias không dấu, `↑ ↓ Enter`, `Esc` đóng. Tìm cục bộ (mock), SoT `components/layout/quick-search.tsx`.
 - `/` hero search AI full width mở quick search (`openQuickSearch()`); **Gần đây** 3 cột × 5 action ghi nhận mỗi lần đổi route (tối đa 15, bù gợi ý khi thiếu, `localStorage` key `beauty-recent-nav`, SoT `lib/recents.ts`).

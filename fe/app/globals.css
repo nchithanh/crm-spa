@@ -3,12 +3,12 @@
 /* FullCalendar denser SaaS look — brand chỉ trên chrome nút */
 .fc {
   --fc-border-color: #e2e8f0;
-  --fc-button-bg-color: #5d4094;
-  --fc-button-border-color: #5d4094;
-  --fc-button-hover-bg-color: #47326f;
-  --fc-button-hover-border-color: #47326f;
-  --fc-button-active-bg-color: #362555;
-  --fc-button-active-border-color: #362555;
+  --fc-button-bg-color: #7800cf;
+  --fc-button-border-color: #7800cf;
+  --fc-button-hover-bg-color: #4b0082;
+  --fc-button-hover-border-color: #4b0082;
+  --fc-button-active-bg-color: #3d0069;
+  --fc-button-active-border-color: #3d0069;
   --fc-today-bg-color: #f8fafc;
   font-size: 0.8125rem;
 }
@@ -57,23 +57,27 @@
 }
 
 :root {
+  /* Shell: trắng / đen — không wash tím trên surface */
   --background: #ffffff;
-  --foreground: #0f172a;
+  --foreground: #0a0a0a;
   --card: #ffffff;
   --muted: #64748b;
-  --border: #e2e8f0;
-  /* Brand chrome — CTA / nav active / FAB */
-  --brand-50: #f6f4fb;
-  --brand-100: #eae4f6;
-  --brand-300: #b19ada;
-  --brand-400: #997dcc;
-  --brand-500: #5d4094;
-  --brand-600: #47326f;
-  --brand-700: #362555;
-  --brand-950: #291e3d;
+  --border: #e5e7eb;
+  --sidebar: #0a0a0a;
+  --sidebar-fg: #e5e7eb;
+  --surface-muted: #f4f4f5;
+  /* Theme — chỉ CTA / FAB / primary button */
+  --brand-50: #f8f0fd;
+  --brand-100: #f0d9fb;
+  --brand-300: #c78aeb;
+  --brand-400: #a04adf;
+  --brand-500: #7800cf;
+  --brand-600: #4b0082;
+  --brand-700: #3d0069;
+  --brand-950: #1f0036;
   --primary: var(--brand-500);
   --primary-foreground: #ffffff;
-  /* Semantic — tách khỏi brand */
+  /* Semantic — warning / status / stage (không dùng brand) */
   --success: #059669;
   --success-bg: #ecfdf5;
   --success-fg: #047857;
@@ -151,5 +155,5 @@ a {
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--brand-500) 28%, transparent) transparent;
+  scrollbar-color: color-mix(in srgb, var(--foreground) 22%, transparent) transparent;
 }
